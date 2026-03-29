@@ -1,0 +1,50 @@
+name: J-axon CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: cd jaxon-core-api && pnpm install
+
+      - name: Generate Prisma
+        run: cd jaxon-core-api && npx prisma generate
+
+      - name: Run Tests
+        run: cd jaxon-core-api && pnpm test:coverage
+
+      - name: Build
+        run: cd jaxon-core-api && pnpm build
+
+  frontend-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: cd jaxon-client && pnpm install
+
+      - name: Lint & Build
+        run: cd jaxon-client && pnpm build
