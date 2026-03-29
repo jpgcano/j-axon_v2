@@ -3,6 +3,7 @@ import cors from 'cors';
 import { authRouter } from './presentation/auth/authRoutes.js';
 import { assetRouter } from './presentation/assets/assetRoutes.js';
 import { ticketRouter } from './presentation/tickets/ticketRoutes.js';
+import { maintenanceRouter } from './presentation/maintenance/maintenanceRoutes.js';
 import { errorHandler } from './presentation/middlewares/errorHandler.js';
 const app = express();
 const port = process.env.PORT || 3001;

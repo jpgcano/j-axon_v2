@@ -27,4 +27,14 @@ export declare const createTicket: CreateTicket;
 export declare const listTickets: ListTickets;
 export declare const getTicket: GetTicket;
 export declare const updateTicketStatus: UpdateTicketStatus;
+import { PrismaMaintenanceRepository } from '../repositories/PrismaMaintenanceRepository.js';
+import { CreateMaintenance } from '../../application/maintenance/CreateMaintenance.js';
+import { ListMaintenance } from '../../application/maintenance/ListMaintenance.js';
+import { GetMaintenance } from '../../application/maintenance/GetMaintenance.js';
+import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
+export declare const maintenanceRepository: PrismaMaintenanceRepository;
+export declare const createMaintenance: CreateMaintenance;
+export declare const listMaintenance: ListMaintenance;
+export declare const getMaintenance: GetMaintenance;
+export declare const updateMaintenanceStatus: UpdateMaintenanceStatus;
 //# sourceMappingURL=container.d.ts.map

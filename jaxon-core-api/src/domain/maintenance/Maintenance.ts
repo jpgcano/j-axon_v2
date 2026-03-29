@@ -35,24 +35,14 @@ export class Maintenance {
 
   get id(): string { return this.props.id; }
   get assetId(): string { return this.props.assetId; }
-  get type(): MaintenanceType { return this.props.type; }
   get status(): MaintenanceStatus { return this.props.status; }
+  get type(): MaintenanceType { return this.props.type; }
 
-  public start(updatedBy: string): void {
-    this.props.status = MaintenanceStatus.IN_PROGRESS;
-    this.props.updatedBy = updatedBy;
-    this.props.updatedAt = new Date();
-  }
-
-  public complete(updatedBy: string): void {
-    this.props.status = MaintenanceStatus.COMPLETED;
-    this.props.completedDate = new Date();
-    this.props.updatedBy = updatedBy;
-    this.props.updatedAt = new Date();
-  }
-
-  public cancel(updatedBy: string): void {
-    this.props.status = MaintenanceStatus.CANCELLED;
+  public updateStatus(newStatus: MaintenanceStatus, updatedBy: string): void {
+    if (newStatus === MaintenanceStatus.COMPLETED && this.props.status !== MaintenanceStatus.COMPLETED) {
+      this.props.completedDate = new Date();
+    }
+    this.props.status = newStatus;
     this.props.updatedBy = updatedBy;
     this.props.updatedAt = new Date();
   }

@@ -28,11 +28,9 @@ export declare class Maintenance {
     constructor(props: MaintenanceProps);
     get id(): string;
     get assetId(): string;
-    get type(): MaintenanceType;
     get status(): MaintenanceStatus;
-    start(updatedBy: string): void;
-    complete(updatedBy: string): void;
-    cancel(updatedBy: string): void;
+    get type(): MaintenanceType;
+    updateStatus(newStatus: MaintenanceStatus, updatedBy: string): void;
     toPrimitives(): MaintenanceProps;
 }
 //# sourceMappingURL=Maintenance.d.ts.map

@@ -17,21 +17,13 @@ export class Maintenance {
     }
     get id() { return this.props.id; }
     get assetId() { return this.props.assetId; }
-    get type() { return this.props.type; }
     get status() { return this.props.status; }
-    start(updatedBy) {
-        this.props.status = MaintenanceStatus.IN_PROGRESS;
-        this.props.updatedBy = updatedBy;
-        this.props.updatedAt = new Date();
-    }
-    complete(updatedBy) {
-        this.props.status = MaintenanceStatus.COMPLETED;
-        this.props.completedDate = new Date();
-        this.props.updatedBy = updatedBy;
-        this.props.updatedAt = new Date();
-    }
-    cancel(updatedBy) {
-        this.props.status = MaintenanceStatus.CANCELLED;
+    get type() { return this.props.type; }
+    updateStatus(newStatus, updatedBy) {
+        if (newStatus === MaintenanceStatus.COMPLETED && this.props.status !== MaintenanceStatus.COMPLETED) {
+            this.props.completedDate = new Date();
+        }
+        this.props.status = newStatus;
         this.props.updatedBy = updatedBy;
         this.props.updatedAt = new Date();
     }
