@@ -27,3 +27,14 @@ export function useCreateAsset() {
     },
   });
 }
+
+export function useUpdateAsset() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateAssetRequest> }) => AssetService.updateAsset(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+    },
+  });
+}

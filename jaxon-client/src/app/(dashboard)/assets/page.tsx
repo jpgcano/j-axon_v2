@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAssets, useCreateAsset } from '@/hooks/useAssets';
+import { useAssets, useCreateAsset, useUpdateAsset } from '@/hooks/useAssets';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -44,7 +44,10 @@ const getStatusBadge = (status: string) => {
 export default function AssetsPage() {
   const { data: assets, isLoading, error } = useAssets();
   const createAsset = useCreateAsset();
+  const updateAsset = useUpdateAsset();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingAsset, setEditingAsset] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof assetSchema>>({
@@ -58,6 +61,28 @@ export default function AssetsPage() {
         reset();
       }
     });
+  };
+
+  const onEditSubmit = (data: z.infer<typeof assetSchema>) => {
+    if (editingAsset) {
+      updateAsset.mutate({ id: editingAsset.id, data: { ...data, status: editingAsset.status } }, {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setEditingAsset(null);
+          reset();
+        }
+      });
+    }
+  };
+
+  const openEditModal = (asset: any) => {
+    setEditingAsset(asset);
+    reset({
+      name: asset.name,
+      type: asset.type,
+      location: asset.location,
+    });
+    setIsEditModalOpen(true);
   };
 
   const filteredAssets = assets?.filter((asset: any) => 
@@ -133,7 +158,7 @@ export default function AssetsPage() {
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{asset.location}</td>
                     <td className="px-6 py-4">{getStatusBadge(asset.status)}</td>
                     <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="sm">Edit</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openEditModal(asset)}>Edit</Button>
                     </td>
                   </tr>
                 ))
@@ -181,6 +206,48 @@ export default function AssetsPage() {
           <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 mt-6">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button type="submit" isLoading={createAsset.isPending}>Save Asset</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setEditingAsset(null); }} title="Edit Asset">
+        <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4 pt-2">
+          <Input 
+            id="edit-name" 
+            label="Asset Name" 
+            placeholder="e.g. MacBook Pro M3" 
+            {...register('name')} 
+            error={errors.name?.message} 
+          />
+          
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Device Type</label>
+            <select 
+              {...register('type')}
+              className={`flex h-10 w-full rounded-lg border bg-white dark:bg-slate-900 px-3 py-2 text-sm focus-ring ${errors.type ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'}`}
+            >
+              <option value="PC">Desktop PC</option>
+              <option value="LAPTOP">Laptop</option>
+              <option value="SERVER">Server</option>
+              <option value="MONITOR">Monitor</option>
+              <option value="MOBILE">Mobile Device</option>
+              <option value="PERIPHERAL">Peripheral</option>
+              <option value="OTHER">Other</option>
+            </select>
+            {errors.type && <p className="text-xs text-red-500">{errors.type.message}</p>}
+          </div>
+
+          <Input 
+            id="edit-location" 
+            label="Location" 
+            placeholder="e.g. Server Room A, Madrid HQ" 
+            {...register('location')} 
+            error={errors.location?.message} 
+          />
+
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 mt-6">
+            <Button type="button" variant="outline" onClick={() => { setIsEditModalOpen(false); setEditingAsset(null); }}>Cancel</Button>
+            <Button type="submit" isLoading={updateAsset.isPending}>Update Asset</Button>
           </div>
         </form>
       </Modal>
