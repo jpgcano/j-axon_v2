@@ -26,4 +26,14 @@ export const authenticateUser = new AuthenticateUser(userRepository, passwordHas
 export const createAsset = new CreateAsset(assetRepository);
 export const listAssets = new ListAssets(assetRepository);
 export const getAsset = new GetAsset(assetRepository);
+import { PrismaTicketRepository } from '../repositories/PrismaTicketRepository.js';
+import { CreateTicket } from '../../application/tickets/CreateTicket.js';
+import { ListTickets } from '../../application/tickets/ListTickets.js';
+import { GetTicket } from '../../application/tickets/GetTicket.js';
+import { UpdateTicketStatus } from '../../application/tickets/UpdateTicketStatus.js';
+export const ticketRepository = new PrismaTicketRepository(prisma);
+export const createTicket = new CreateTicket(ticketRepository);
+export const listTickets = new ListTickets(ticketRepository);
+export const getTicket = new GetTicket(ticketRepository);
+export const updateTicketStatus = new UpdateTicketStatus(ticketRepository);
 //# sourceMappingURL=container.js.map
