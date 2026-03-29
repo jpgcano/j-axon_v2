@@ -1,5 +1,9 @@
-import cors from 'cors';
 import express from 'express';
+import cors from 'cors';
+import { authRouter } from './presentation/auth/authRoutes.js';
+import { assetRouter } from './presentation/assets/assetRoutes.js';
+import { ticketRouter } from './presentation/tickets/ticketRoutes.js';
+import { errorHandler } from './presentation/middlewares/errorHandler.js';
 
 export const createApp = (): express.Express => {
   const app = express();
@@ -10,6 +14,14 @@ export const createApp = (): express.Express => {
   app.get('/api/v1/health', (_req, res) => {
     res.json({ status: 'ok', service: 'jaxon-core-api' });
   });
+
+  // Mount Routes
+  app.use('/api/auth', authRouter);
+  app.use('/api/assets', assetRouter);
+  app.use('/api/tickets', ticketRouter);
+
+  // Global Error Handler
+  app.use(errorHandler);
 
   return app;
 };
