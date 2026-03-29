@@ -11,7 +11,7 @@ function sha256(input: string): string {
 }
 
 async function main() {
-  console.log("🌱 Seeding J-axon database...");
+  console.log("[SEED] Seeding J-axon database...");
 
   const passwordHash = await bcrypt.hash("Admin@2024!", 12);
   const now = new Date();
@@ -29,13 +29,13 @@ async function main() {
     ON CONFLICT (email) DO NOTHING
   `, adminId, "admin@jaxon.local", passwordHash, "ADMIN", true, now, systemIp, integrityHash);
 
-  console.log(`✅ Admin user created: admin@jaxon.local (${adminId})`);
-  console.log("🌱 Seeding completed!");
+  console.log(`[SEED] Admin user created: admin@jaxon.local (${adminId})`);
+  console.log("[SEED] Seeding completed.");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seed failed:", e);
+    console.error("[SEED] Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {
