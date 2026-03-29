@@ -16,8 +16,8 @@
  * - Result: LOW (1-5), MEDIUM (6-12), HIGH (13-20), EXTREME (21-25)
  */
 
-import { RiskLevel } from './value-objects/RiskLevel';
-import { TicketStatus } from './value-objects/TicketStatus';
+import { RiskLevel } from './value-objects/RiskLevel.js';
+import { TicketStatus } from './value-objects/TicketStatus.js';
 
 export interface TicketPrimitives {
   id: string;
