@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "skills": {
+    "codex": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "computedHash": "adf15321d326358754f8d410a011ccfc2c24537ba4812649682a8dff7054c2df"
+    },
+    "deploy-to-vercel": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "d2b5bcc7c09fdb649129ffc7dd7b647ec1b155736974b974292675afd588cb39"
+    },
+    "design-md": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "computedHash": "d3a4c7d2f2715a33662c8b06ffc16035d01965a8b4ed81c2958fb22ae94760f8"
+    },
+    "frontend-design": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "computedHash": "9ebe6c652743fcde8d2ae773f34b6f548dcc8b2e75a3a30936adcd8b95dd2d16"
+    },
+    "git-advanced-workflows": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "c42c3059154889e4f80818407c6634197eefe87dc752d6a0cad8cfc2391550bb"
+    },
+    "git-best-practices": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "computedHash": "8d295322594a6810843842ae9e0edeecfc021cc4e7d59889da63d58c9c2c3da5"
+    },
+    "git-rebase-sync": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "computedHash": "16343a9100b6e50cf773a5d743dd5469776dbd4a9eb9fbe7fbe23de677e35aef"
+    },
+    "git-worktree-tidy": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "computedHash": "9ad1a9bc65697f9c29bd51fe2b71914b7823ea14f13d914a9452603520fd62af"
+    },
+    "javascript-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "8d0a8d7615ff343770af0218720691d56c55ae258793565936c8b3a97e188f51"
+    },
+    "modern-javascript-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "0029f68d5b92753960cf57c00da77913973507350dad148acaa46313691a509a"
+    },
+    "nextjs-app-router-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "d2f0a7065f7418fdb3ae88559f1f1426f40c26f2b5aebcd394797418d4bb3b04"
+    },
+    "nextjs-react-typescript": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "eb995cc826bf48498e0e90969fc7dadfa2ec634002c26cfcfde565134cefa738"
+    },
+    "nextjs-typescript-tailwindcss-supabase": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "b866ca1d166d1e9140c236a839550c1c46853113de0905d107593f3b50800a22"
+    },
+    "react": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "463b2de9fe87acf9bc3cb692a91d8628ee1502aee2c77745d2dd1f6bfe206779"
+    },
+    "react-hook-form-zod": {
+      "source": "ovachiever/droid-tings",
+      "sourceType": "github",
+      "computedHash": "1ee0fc6e35b6b6973d6117657e644605a5646bd7e6c2d0c55f52ec073679ac65"
+    },
+    "react-modernization": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "11facc88acf2a1920b9b77d88e7efa109a00577dbf37d1adefca549eb3244d6c"
+    },
+    "react-native-cursor-rules": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "5fbd79056c4ee0ecb78676ea0b99898bff631da9c768e992731b7caae5550d84"
+    },
+    "react-native-expo": {
+      "source": "ovachiever/droid-tings",
+      "sourceType": "github",
+      "computedHash": "6d2358ae650b03656dd3f0b77b27f37aa2ac68888c63f8c8ef46efcbbb83db07"
+    },
+    "react-native-r3f": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "33a0423b65f665f2d7501bea65123d9bb3dd4ae3a7a88e9de776da05b2bc1d1e"
+    },
+    "react-query": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "7e9543c800d45f1cd9efaeb9f6e5dcc91d3922b768ec41b06a98341840e0b8c7"
+    },
+    "react:components": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "computedHash": "01a94f035a1c3a1a405f611c0df212433d8973f18bf16e94540875ec58ee7b9b"
+    },
+    "responsive-design": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "0977c17696ab66ea613ce5b83c856bc7cd01332d98ae237dac7539840fe96187"
+    },
+    "supabase": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "fb5a348e5e4bc0d49d378e8340123bfcd778de14f29dac9d45cff7edc469fa6e"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "988d80e52c67c3692d43cc963b6a048a239895e88b272b061de55370d0f8efc3"
+    },
+    "tailwindcss": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "b1d95ac9242e613966fb11ed413fd2ff61f04641e4e8c1418e0e8258573fcc68"
+    },
+    "typescript": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "0d109e1aac465feed57433e20cf0409ec7436c1519f0c67a2d4336b008fd26cc"
+    },
+    "typescript-mcp": {
+      "source": "ovachiever/droid-tings",
+      "sourceType": "github",
+      "computedHash": "aa3280c5aecb90a1bc7493b7ba2c87680e3a68f21ff2b2973008c5d4f8b5246f"
+    },
+    "ui-design-system": {
+      "source": "ovachiever/droid-tings",
+      "sourceType": "github",
+      "computedHash": "2f6f9af21d896c6a4c2e3274d2f974099cf8f4a2f6f8c953c273b7029d92b396"
+    },
+    "ux-design": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "281fdd51b3ee348c678d5a8f416ff63a9ede9ea6200687ec006dc48cbf216522"
+    },
+    "vercel-cli-with-tokens": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "1e1ef4ae4ad838d0ad5f93a659bf065475705cd552bd3c9a2a4faade6098b030"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "bbc31a48537b473ff4feea6360ef0de3bfdcbef26c14f4967a5deefe8ca801d3"
+    },
+    "vercel-react-native-skills": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "2e9088a7333666d8c2833b8ff58bd51b955501c42b4c7244f72b4cbf22dafcc4"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    }
+  }
+}
