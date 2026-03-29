@@ -1,7 +1,7 @@
 import { PrismaClient } from '../../../generated/prisma/client.js';
 import { createHash } from 'crypto';
 import { User, UserRole } from '../../domain/users/User.js';
-import { UserRepository } from '../../domain/users/UserRepository.js';
+import type { UserRepository } from '../../domain/users/UserRepository.js';
 
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -20,7 +20,7 @@ export class PrismaUserRepository implements UserRepository {
     
     const integrityHash = this.generateIntegrityHash(props.id, props.email, props.updatedAt);
 
-    await this.prisma.jaxon_users.upsert({
+    await this.prisma.jaxonUser.upsert({
       where: { id: props.id },
       update: {
         email: props.email,
@@ -49,7 +49,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   public async findById(id: string): Promise<User | null> {
-    const data = await this.prisma.jaxon_users.findUnique({
+    const data = await this.prisma.jaxonUser.findUnique({
       where: { id },
     });
 
@@ -69,7 +69,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   public async findByEmail(email: string): Promise<User | null> {
-    const data = await this.prisma.jaxon_users.findUnique({
+    const data = await this.prisma.jaxonUser.findUnique({
       where: { email },
     });
 

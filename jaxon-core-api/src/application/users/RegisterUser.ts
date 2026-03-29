@@ -1,6 +1,7 @@
-import { User, UserRole, UserProps } from '../../domain/users/User.js';
-import { UserRepository } from '../../domain/users/UserRepository.js';
-import { PasswordHasher } from '../../domain/users/PasswordHasher.js';
+import { User, UserRole } from '../../domain/users/User.js';
+import type { UserProps } from '../../domain/users/User.js';
+import type { UserRepository } from '../../domain/users/UserRepository.js';
+import type { PasswordHasher } from '../../domain/users/PasswordHasher.js';
 import { InvalidArgumentException } from '../../domain/core/exceptions.js';
 
 export interface RegisterUserRequest {

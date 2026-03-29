@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { TokenPayload, AuthTokens, TokenService } from '../../domain/users/TokenService.js';
+import type { TokenPayload, AuthTokens, TokenService } from '../../domain/users/TokenService.js';
 import { UnauthorizedException } from '../../domain/core/exceptions.js';
 
 export class JwtTokenService implements TokenService {
@@ -15,11 +15,11 @@ export class JwtTokenService implements TokenService {
 
   public async generateToken(payload: TokenPayload): Promise<AuthTokens> {
     const accessToken = jwt.sign(payload, this.jwtSecret, {
-      expiresIn: this.expiresIn,
+      expiresIn: this.expiresIn as any,
     });
 
     const refreshToken = jwt.sign({ userId: payload.userId }, this.jwtSecret, {
-      expiresIn: this.refreshExpiresIn,
+      expiresIn: this.refreshExpiresIn as any,
     });
 
     return { 

@@ -1,6 +1,6 @@
-import { UserRepository } from '../../domain/users/UserRepository.js';
-import { PasswordHasher } from '../../domain/users/PasswordHasher.js';
-import { TokenService, AuthTokens } from '../../domain/users/TokenService.js';
+import type { UserRepository } from '../../domain/users/UserRepository.js';
+import type { PasswordHasher } from '../../domain/users/PasswordHasher.js';
+import type { TokenService, AuthTokens } from '../../domain/users/TokenService.js';
 import { UnauthorizedException } from '../../domain/core/exceptions.js';
 
 export interface AuthenticateUserRequest {
