@@ -10,6 +10,7 @@ import { PrismaAssetRepository } from '../repositories/PrismaAssetRepository.js'
 import { CreateAsset } from '../../application/assets/CreateAsset.js';
 import { ListAssets } from '../../application/assets/ListAssets.js';
 import { GetAsset } from '../../application/assets/GetAsset.js';
+import { UpdateAsset } from '../../application/assets/UpdateAsset.js';
 
 // Initialize Prisma
 const connectionString = process.env.DATABASE_URL!;
@@ -34,6 +35,7 @@ export const authenticateUser = new AuthenticateUser(userRepository, passwordHas
 export const createAsset = new CreateAsset(assetRepository);
 export const listAssets = new ListAssets(assetRepository);
 export const getAsset = new GetAsset(assetRepository);
+export const updateAsset = new UpdateAsset(assetRepository);
 
 import { PrismaTicketRepository } from '../repositories/PrismaTicketRepository.js';
 import { CreateTicket } from '../../application/tickets/CreateTicket.js';
@@ -47,14 +49,29 @@ export const listTickets = new ListTickets(ticketRepository);
 export const getTicket = new GetTicket(ticketRepository);
 export const updateTicketStatus = new UpdateTicketStatus(ticketRepository);
 
+// Maintenance Module Dependencies
 import { PrismaMaintenanceRepository } from '../repositories/PrismaMaintenanceRepository.js';
+import { PrismaAuditLogRepository } from '../repositories/PrismaAuditLogRepository.js';
+import { AuditService } from '../services/AuditService.js';
+import { webSocketService } from '../sockets/WebSocketService.js';
+
 import { CreateMaintenance } from '../../application/maintenance/CreateMaintenance.js';
 import { ListMaintenance } from '../../application/maintenance/ListMaintenance.js';
 import { GetMaintenance } from '../../application/maintenance/GetMaintenance.js';
 import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
+import { MaintenanceController } from '../../presentation/maintenance/MaintenanceController.js';
 
 export const maintenanceRepository = new PrismaMaintenanceRepository(prisma);
-export const createMaintenance = new CreateMaintenance(maintenanceRepository);
+export const auditLogRepository = new PrismaAuditLogRepository(prisma);
+export const auditService = new AuditService(auditLogRepository);
+
+export const createMaintenance = new CreateMaintenance(maintenanceRepository, webSocketService, auditService);
 export const listMaintenance = new ListMaintenance(maintenanceRepository);
 export const getMaintenance = new GetMaintenance(maintenanceRepository);
-export const updateMaintenanceStatus = new UpdateMaintenanceStatus(maintenanceRepository);
+export const updateMaintenanceStatus = new UpdateMaintenanceStatus(maintenanceRepository, webSocketService, auditService);
+
+export const maintenanceController = new MaintenanceController(
+  createMaintenance,
+  listMaintenance,
+  updateMaintenanceStatus
+);
