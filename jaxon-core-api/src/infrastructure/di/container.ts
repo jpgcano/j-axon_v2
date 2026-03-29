@@ -46,3 +46,15 @@ export const createTicket = new CreateTicket(ticketRepository);
 export const listTickets = new ListTickets(ticketRepository);
 export const getTicket = new GetTicket(ticketRepository);
 export const updateTicketStatus = new UpdateTicketStatus(ticketRepository);
+
+import { PrismaMaintenanceRepository } from '../repositories/PrismaMaintenanceRepository.js';
+import { CreateMaintenance } from '../../application/maintenance/CreateMaintenance.js';
+import { ListMaintenance } from '../../application/maintenance/ListMaintenance.js';
+import { GetMaintenance } from '../../application/maintenance/GetMaintenance.js';
+import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
+
+export const maintenanceRepository = new PrismaMaintenanceRepository(prisma);
+export const createMaintenance = new CreateMaintenance(maintenanceRepository);
+export const listMaintenance = new ListMaintenance(maintenanceRepository);
+export const getMaintenance = new GetMaintenance(maintenanceRepository);
+export const updateMaintenanceStatus = new UpdateMaintenanceStatus(maintenanceRepository);
