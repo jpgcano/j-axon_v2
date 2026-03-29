@@ -79,7 +79,7 @@ export default function LoginPage() {
                 className={`mt-1 block w-full rounded-md border p-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm ${
                   errors.password ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="••••••••"
+                placeholder="********"
                 {...register('password')}
               />
               {errors.password && (
