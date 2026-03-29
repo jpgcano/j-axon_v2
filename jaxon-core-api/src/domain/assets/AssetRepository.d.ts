@@ -1,0 +1,8 @@
+import { Asset } from './Asset.js';
+export interface AssetRepository {
+    save(asset: Asset): Promise<void>;
+    findById(id: string): Promise<Asset | null>;
+    findAll(): Promise<Asset[]>;
+    findByAssignedUser(userId: string): Promise<Asset[]>;
+}
+//# sourceMappingURL=AssetRepository.d.ts.map

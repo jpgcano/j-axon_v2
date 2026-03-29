@@ -42,10 +42,11 @@ enum RiskLevel {
 }
 
 enum TicketStatus {
-  OPEN
   PENDING_APPROVAL
+  APPROVED
   IN_PROGRESS
   RESOLVED
+  CLOSED
 
   @@map("ticket_status")
 }
@@ -144,7 +145,9 @@ model JaxonTicket {
   id                  String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   asset_id            String      @db.Uuid
   issue_description   String      @db.Text
-  inherent_risk_level RiskLevel
+  probability         Int         @db.SmallInt // 1-5: likelihood scale
+  consequence         Int         @db.SmallInt // 1-5: impact scale
+  inherent_risk_level RiskLevel   // Calculated: probability * consequence -> RiskLevel
   status              TicketStatus
   assigned_tech_id    String?     @db.Uuid
   approved_by_id      String?     @db.Uuid
