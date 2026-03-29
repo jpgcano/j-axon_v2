@@ -3,7 +3,7 @@ import { CreateMaintenance } from '../../application/maintenance/CreateMaintenan
 import { ListMaintenance } from '../../application/maintenance/ListMaintenance.js';
 import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
 
-import { matchError } from 'better-result';
+import { matchError } from '../../domain/core/Result.js';
 
 export class MaintenanceController {
   constructor(

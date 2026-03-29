@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import type { PredictMaintenance } from '../../application/ai/PredictMaintenance.js';
 
-import { matchError } from 'better-result';
+import { matchError } from '../../domain/core/Result.js';
 
 export class AIController {
   constructor(private readonly predictMaintenance: PredictMaintenance) {}

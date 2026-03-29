@@ -1,6 +1,6 @@
 import type { Maintenance } from '../../domain/maintenance/Maintenance.js';
 import type { MaintenanceRepository } from '../../domain/maintenance/MaintenanceRepository.js';
-import { Result } from 'better-result';
+import { Result } from '../../domain/core/Result.js';
 import { InternalError } from '../../domain/core/errors.js';
 
 export class ListMaintenance {
