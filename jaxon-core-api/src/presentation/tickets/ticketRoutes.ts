@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { TicketController } from './TicketController.js';
-import { createTicket, listTickets, getTicket, updateTicketStatus } from '../../infrastructure/di/container.js';
+import { createTicket, listTickets, getTicket, updateTicketStatus, ticketRepository } from '../../infrastructure/di/container.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { requireTicketApprover } from '../middlewares/requireTicketApprover.js';
 
 export const ticketRouter = Router();
 
@@ -13,4 +14,4 @@ const ticketController = new TicketController(createTicket, listTickets, getTick
 ticketRouter.post('/', ticketController.create);
 ticketRouter.get('/', ticketController.list);
 ticketRouter.get('/:id', ticketController.getById);
-ticketRouter.patch('/:id/status', ticketController.updateStatus);
+ticketRouter.patch('/:id/status', requireTicketApprover(ticketRepository), ticketController.updateStatus);

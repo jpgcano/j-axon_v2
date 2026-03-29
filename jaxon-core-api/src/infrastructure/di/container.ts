@@ -29,6 +29,12 @@ export const tokenService = new JwtTokenService(
   '7d'
 );
 
+// Audit & Logging Service (used by multiple modules)
+import { PrismaAuditLogRepository } from '../repositories/PrismaAuditLogRepository.js';
+import { AuditService } from '../services/AuditService.js';
+export const auditLogRepository = new PrismaAuditLogRepository(prisma);
+export const auditService = new AuditService(auditLogRepository);
+
 // Use Cases
 export const registerUser = new RegisterUser(userRepository, passwordHasher);
 export const authenticateUser = new AuthenticateUser(userRepository, passwordHasher, tokenService);
@@ -42,17 +48,16 @@ import { CreateTicket } from '../../application/tickets/CreateTicket.js';
 import { ListTickets } from '../../application/tickets/ListTickets.js';
 import { GetTicket } from '../../application/tickets/GetTicket.js';
 import { UpdateTicketStatus } from '../../application/tickets/UpdateTicketStatus.js';
+import { AuditLoggerAdapter } from '../adapters/AuditLoggerAdapter.js';
 
 export const ticketRepository = new PrismaTicketRepository(prisma);
-export const createTicket = new CreateTicket(ticketRepository);
+export const createTicket = new CreateTicket(ticketRepository, assetRepository, new AuditLoggerAdapter(auditService));
 export const listTickets = new ListTickets(ticketRepository);
 export const getTicket = new GetTicket(ticketRepository);
-export const updateTicketStatus = new UpdateTicketStatus(ticketRepository);
+export const updateTicketStatus = new UpdateTicketStatus(ticketRepository, new AuditLoggerAdapter(auditService));
 
 // Maintenance Module Dependencies
 import { PrismaMaintenanceRepository } from '../repositories/PrismaMaintenanceRepository.js';
-import { PrismaAuditLogRepository } from '../repositories/PrismaAuditLogRepository.js';
-import { AuditService } from '../services/AuditService.js';
 import { webSocketService } from '../sockets/WebSocketService.js';
 
 import { CreateMaintenance } from '../../application/maintenance/CreateMaintenance.js';
@@ -62,8 +67,6 @@ import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMai
 import { MaintenanceController } from '../../presentation/maintenance/MaintenanceController.js';
 
 export const maintenanceRepository = new PrismaMaintenanceRepository(prisma);
-export const auditLogRepository = new PrismaAuditLogRepository(prisma);
-export const auditService = new AuditService(auditLogRepository);
 
 export const createMaintenance = new CreateMaintenance(maintenanceRepository, webSocketService, auditService);
 export const listMaintenance = new ListMaintenance(maintenanceRepository);

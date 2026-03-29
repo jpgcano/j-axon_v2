@@ -74,8 +74,9 @@ export class TicketController {
       const { id } = req.params;
       const data = updateStatusSchema.parse(req.body);
       const actorId = req.user?.id;
+      const userRole = req.user?.role;
 
-      if (!actorId) {
+      if (!actorId || !userRole) {
         res.status(401).json({ error: 'Unauthorized user context missing' });
         return;
       }
@@ -84,6 +85,7 @@ export class TicketController {
         id: id as string,
         status: data.status,
         actorId,
+        userRole,
       });
 
       res.status(200).json(ticket.toPrimitives());
