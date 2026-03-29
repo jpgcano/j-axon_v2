@@ -3,10 +3,18 @@ import { BcryptPasswordHasher } from '../security/BcryptPasswordHasher.js';
 import { JwtTokenService } from '../security/JwtTokenService.js';
 import { RegisterUser } from '../../application/users/RegisterUser.js';
 import { AuthenticateUser } from '../../application/users/AuthenticateUser.js';
+import { PrismaAssetRepository } from '../repositories/PrismaAssetRepository.js';
+import { CreateAsset } from '../../application/assets/CreateAsset.js';
+import { ListAssets } from '../../application/assets/ListAssets.js';
+import { GetAsset } from '../../application/assets/GetAsset.js';
 export declare const prisma: import("../../../generated/prisma/internal/class.js").PrismaClient<never, import("../../../generated/prisma/internal/prismaNamespace.js").GlobalOmitConfig | undefined, import("@prisma/client/runtime/client").DefaultArgs>;
 export declare const userRepository: PrismaUserRepository;
+export declare const assetRepository: PrismaAssetRepository;
 export declare const passwordHasher: BcryptPasswordHasher;
 export declare const tokenService: JwtTokenService;
 export declare const registerUser: RegisterUser;
 export declare const authenticateUser: AuthenticateUser;
+export declare const createAsset: CreateAsset;
+export declare const listAssets: ListAssets;
+export declare const getAsset: GetAsset;
 //# sourceMappingURL=container.d.ts.map
