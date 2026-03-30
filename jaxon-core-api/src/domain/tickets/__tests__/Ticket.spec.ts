@@ -10,9 +10,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Ticket } from '../Ticket';
-import { RiskLevel, RiskLevelEnum } from '../value-objects/RiskLevel';
-import { TicketStatus, TicketStatusEnum } from '../value-objects/TicketStatus';
+import { Ticket } from '../Ticket.js';
+import { RiskLevel, RiskLevelEnum } from '../value-objects/RiskLevel.js';
+import { TicketStatus, TicketStatusEnum } from '../value-objects/TicketStatus.js';
 import { v4 as uuid } from 'uuid';
 
 describe('Ticket Domain Entity', () => {

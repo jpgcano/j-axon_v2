@@ -16,9 +16,12 @@
  */
 
 import { v4 as uuid } from 'uuid';
-import { Ticket, TicketRepository } from '../../domain/tickets/index.js';
-import { AssetRepository } from '../../domain/assets/index.js';
-import { AuditLogger } from '../audit/AuditLogger.js';
+import { Ticket } from '../../domain/tickets/index.js';
+import type { TicketRepository } from '../../domain/tickets/index.js';
+import type { AssetRepository } from '../../domain/assets/index.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
+import type { AuditLogger } from '../audit/AuditLogger.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
 
 export interface CreateTicketRequest {
   assetId: string;
@@ -73,11 +76,11 @@ export class CreateTicket {
     await this.auditLogger.logAction({
       entityTable: 'jaxon_tickets',
       entityId: ticketId,
-      actionType: 'CREATE',
+      actionType: AuditActionType.CREATE,
       payloadBefore: null,
       payloadAfter: ticket.toPrimitives(),
       actorId: request.createdBy,
-      ipOrigin: '0.0.0.0/0', // TODO: get from request context
+      ipOrigin: getRequestContext().ipOrigin || '0.0.0.0',
     });
 
     // Step 5: Return response

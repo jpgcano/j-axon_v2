@@ -1,2 +1,2 @@
-export { RiskLevel, RiskLevelEnum } from './RiskLevel';
-export { TicketStatus, TicketStatusEnum } from './TicketStatus';
+export { RiskLevel, RiskLevelEnum } from './RiskLevel.js';
+export { TicketStatus, TicketStatusEnum } from './TicketStatus.js';

@@ -1,4 +1,4 @@
-export { Ticket, type TicketPrimitives } from './Ticket';
-export { type TicketRepository } from './TicketRepository';
-export { RiskLevel, RiskLevelEnum, TicketStatus, TicketStatusEnum } from './value-objects';
-export { InvalidTicketError } from './exceptions/InvalidTicketError';
+export { Ticket, type TicketPrimitives } from './Ticket.js';
+export { type TicketRepository } from './TicketRepository.js';
+export { RiskLevel, RiskLevelEnum, TicketStatus, TicketStatusEnum } from './value-objects/index.js';
+export { InvalidTicketError } from './exceptions/InvalidTicketError.js';

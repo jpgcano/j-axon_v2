@@ -4,7 +4,7 @@
  * Implements Repository pattern (domain-driven design)
  */
 
-import { Ticket } from './Ticket';
+import { Ticket } from './Ticket.js';
 
 export interface TicketRepository {
   /**

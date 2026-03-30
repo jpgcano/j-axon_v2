@@ -11,9 +11,9 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CreateTicket } from '../CreateTicket.js';
-import { TicketRepository } from '../../../domain/tickets/index.js';
-import { AssetRepository } from '../../../domain/assets/index.js';
-import { AuditLogger } from '../../audit/AuditLogger.js';
+import type { TicketRepository } from '../../../domain/tickets/TicketRepository.js';
+import type { AssetRepository } from '../../../domain/assets/AssetRepository.js';
+import type { AuditLogger } from '../../audit/AuditLogger.js';
 import { v4 as uuid } from 'uuid';
 
 describe('CreateTicket Use Case', () => {
@@ -172,52 +172,43 @@ describe('CreateTicket Use Case', () => {
   describe('Validation errors', () => {
     it('should throw error if asset does not exist', async () => {
       (assetRepository.findById as any).mockResolvedValueOnce(null);
-
-      expect(async () => {
-        await createTicket.execute({
-          assetId: uuid(),
-          description: 'Test',
-          probability: 2,
-          consequence: 2,
-          createdBy: userId,
-        });
-      }).rejects.toThrow('Asset with ID');
+      await expect(createTicket.execute({
+        assetId: uuid(),
+        description: 'Test',
+        probability: 2,
+        consequence: 2,
+        createdBy: userId,
+      })).rejects.toThrow('Asset with ID');
     });
 
     it('should throw error if probability is invalid', async () => {
-      expect(async () => {
-        await createTicket.execute({
-          assetId,
-          description: 'Test',
-          probability: 6, // Out of range
-          consequence: 2,
-          createdBy: userId,
-        });
-      }).rejects.toThrow('Probability must be between 1-5');
+      await expect(createTicket.execute({
+        assetId,
+        description: 'Test',
+        probability: 6, // Out of range
+        consequence: 2,
+        createdBy: userId,
+      })).rejects.toThrow('Probability must be between 1-5');
     });
 
     it('should throw error if consequence is invalid', async () => {
-      expect(async () => {
-        await createTicket.execute({
-          assetId,
-          description: 'Test',
-          probability: 2,
-          consequence: 0, // Out of range
-          createdBy: userId,
-        });
-      }).rejects.toThrow('Consequence must be between 1-5');
+      await expect(createTicket.execute({
+        assetId,
+        description: 'Test',
+        probability: 2,
+        consequence: 0, // Out of range
+        createdBy: userId,
+      })).rejects.toThrow('Consequence must be between 1-5');
     });
 
     it('should throw error if description is empty', async () => {
-      expect(async () => {
-        await createTicket.execute({
-          assetId,
-          description: '', // Empty
-          probability: 2,
-          consequence: 2,
-          createdBy: userId,
-        });
-      }).rejects.toThrow('Description cannot be empty');
+      await expect(createTicket.execute({
+        assetId,
+        description: '', // Empty
+        probability: 2,
+        consequence: 2,
+        createdBy: userId,
+      })).rejects.toThrow('Description cannot be empty');
     });
   });
 
