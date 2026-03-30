@@ -1,88 +1,109 @@
-# INFORME QA ESTRICTO — Revisión de ramas Gemini y Claude
+# INFORME QA ESTRICTO — Revisión Gemini/Claude
 
-Fecha: 2026-03-29  
-Repositorio: `j-axon_v2`
+Fecha de ejecución: 2026-03-29  
+Repositorio: `j-axon_v2`  
+Rama evaluada: `work`
 
-## 1) Alcance ejecutado
+## 1) Contexto revisado en `doc/`
 
-- Se revisó primero la carpeta `doc/` para extraer el contexto de calidad, trazabilidad y estrategia de pruebas.
-- Se auditó el estado real de Git para identificar ramas disponibles a revisar.
-- Se inspeccionó el código backend (`jaxon-core-api`) y frontend (`jaxon-client`).
-- Se implementaron pruebas automatizadas mínimas reales por función/componente actualmente existente.
-- Se validó ejecución de pruebas y build.
+Se revisó la documentación funcional/arquitectura/QA para alinear los criterios de validación técnica y cobertura mínima:
 
-## 2) Hallazgos críticos
+- Requerimientos, arquitectura, API, seguridad y plan maestro QA.
+- Se tomó como referencia explícita el criterio de pruebas unitarias + integración y trazabilidad de calidad.
 
-### 2.1 Ramas de Gemini y Claude **no disponibles**
+## 2) Verificación de ramas de Gemini y Claude
 
-Resultado de `git branch --all --verbose`:
+Resultado real de Git en el entorno evaluado:
+
 - Solo existe la rama local `work`.
-- No hay ramas locales/remotas llamadas `gemini`, `claude`, ni nombres equivalentes.
+- No existen ramas locales o remotas llamadas `gemini`, `claude` o equivalentes.
 
-**Impacto QA:** No es posible hacer comparación rama-a-rama ni auditoría diferencial entre implementaciones de Gemini vs Claude. Esto bloquea parcialmente el requerimiento de revisión comparativa.
+### Conclusión de alcance
 
-### 2.2 Cobertura de pruebas inexistente (estado inicial)
+No fue posible realizar revisión comparativa “rama vs rama” de Gemini y Claude por ausencia de dichas ramas en el repositorio disponible.
 
-Estado detectado antes de cambios:
-- Backend tenía `"test": "echo \"Error: no test specified\" && exit 1"`.
-- Frontend no tenía framework de tests configurado.
+## 3) Auditoría milimétrica de tests existentes (atribuidos a Gemini/Claude)
 
-**Impacto QA:** No había evidencia verificable de calidad funcional automatizada.
+### Estado encontrado
 
-### 2.3 Desalineación con el QA Test Plan del proyecto
+Se detectaron pruebas en `jaxon-core-api/src/application/**/__tests__/*.spec.ts` con problemas graves:
 
-El plan QA (`doc/DOCUMENTO DE PLAN MAESTRO...`) exige una estrategia con unit, integración y umbrales de calidad; el estado inicial no cumplía ni capa unitaria mínima.
+1. Usan `vitest` pero el proyecto no lo tiene instalado/configurado de forma ejecutable en este entorno.
+2. Varias pruebas validan comportamientos no implementados (ejemplo: eventos websocket/auditoría en casos de uso que no reciben esos servicios).
+3. Existen firmas de constructor/requests incompatibles con código real (`actorRole`, argumentos extra).
+4. Se observaron aserciones orientadas a “pasar un escenario ideal” sin validar contratos completos ni manejo de errores real.
 
-**Impacto QA:** Riesgo alto de falsos positivos funcionales y regresiones no detectadas.
+### Dictamen QA
 
-## 3) Revisión de tests “hechos por gemini/claude”
+- Las pruebas `*.spec.ts` actuales **no son confiables** como evidencia de calidad.
+- En su estado actual parecen más cercanas a “métrica superficial” que a verificación funcional real.
 
-No se encontraron archivos de test atribuibles a Gemini o Claude en el estado actual del repositorio.
+## 4) Revisión de aplicación de `SKILL.md` al código
 
-**Conclusión estricta:**
-- No existe base para validar si “testean de verdad” o si fueron escritos para inflar métricas.
-- El problema no es mala calidad del test existente; es ausencia de tests verificables.
+Se auditaron skills relevantes en `doc/.agents/skills/`:
 
-## 4) Revisión de SKILL.md aplicado en código
+- `jaxon-coding-standards`: exige uso de `pnpm` y convenciones consistentes.
+- `javascript-testing-patterns`: recomienda infraestructura de testing coherente y cobertura de rutas felices + errores.
 
-Se detectaron skills bajo `doc/.agents/skills/**/SKILL.md`, pero no hay evidencia en código de aplicación que permita afirmar adopción trazable de prácticas descritas en esos skill docs (por ejemplo, convención reflejada en checks automáticos o referencias explícitas en pipeline).
+### Hallazgos
 
-**Resultado:** Cumplimiento de skills **no demostrable** con el estado actual.
+- Había desalineación de facto: tests en framework no operativo (`vitest`) y sin pipeline verificable.
+- No existe evidencia fuerte de cumplimiento sistemático de skills en CI (gates/checks automáticos).
 
-## 5) Acciones QA implementadas
+## 5) Trabajo QA ejecutado en esta intervención
 
-### Backend (`jaxon-core-api`)
-- Refactor para habilitar testabilidad real:
-  - Se extrajo `createApp()` para instanciar Express sin arrancar puerto en tests.
-  - Se dejó `startServer()` para ejecución normal.
-  - Se evita auto-listen cuando el módulo no se ejecuta como entrypoint (`import.meta.url`).
-- Se crearon pruebas HTTP automatizadas (Node Test Runner + `fetch`) para:
-  - `GET /api/v1/health` respuesta y payload exacto.
-  - Ruta inexistente retorna `404`.
-- Se integró script de ejecución de pruebas con `node --import tsx --test`.
+## 5.1 Nuevas pruebas reales por función (capa aplicación)
 
-### Frontend (`jaxon-client`)
-- Se crearon pruebas automatizadas con Node Test Runner para validar:
-  - Presencia del heading esperado en `page.tsx`.
-  - Presencia de enlaces clave (Documentation/Templates).
-  - Presencia de metadata esperada y estructura base (`html` / `body`) en `layout.tsx`.
+Se creó `jaxon-core-api/src/application/application.qa.test.ts` con pruebas ejecutables (Node test runner) que validan:
 
-## 6) Estado funcional después de QA
+- Assets: `CreateAsset`, `GetAsset`, `ListAssets`.
+- Tickets: `CreateTicket`, `GetTicket`, `ListTickets`, `UpdateTicketStatus`.
+- Maintenance: `CreateMaintenance`, `GetMaintenance`, `ListMaintenance`, `UpdateMaintenanceStatus`.
+- Users: `RegisterUser`, `AuthenticateUser`.
+- AI: `PredictMaintenance`.
 
-- Backend pasa pruebas automatizadas.
-- Frontend pasa pruebas automatizadas.
-- Existe base mínima de validación automatizada por función/componente existente.
+Se cubren rutas felices y errores/not found/internal en cada bloque funcional.
 
-## 7) Fallas pendientes y deuda técnica
+## 5.2 Correcciones mínimas para habilitar testabilidad funcional
 
-1. **Falta de ramas comparativas Gemini/Claude** para cumplir auditoría diferencial solicitada.  
-2. **Cobertura global no medida contra objetivo 85%** del plan maestro (falta instrumentación y gate obligatorio en CI).  
-3. **Sin pruebas E2E ni seguridad** todavía (pendiente respecto al plan QA).  
-4. **Sin evidencia formal de adopción de skills** en CI/pipeline/checklists.
+- Se agregó implementación local de `Result` y `matchError` para eliminar dependencia faltante (`better-result`) y estabilizar flujos de resultado.
+- Se reemplazaron errores tipados dependientes de `better-result` por clases de error locales.
+- Se corrigió la entidad `Maintenance` agregando métodos `start`, `complete`, `cancel` que hoy invoca `UpdateMaintenanceStatus`.
+- Se corrigió el contenedor DI para inyectar dependencias completas de `CreateMaintenance` y `UpdateMaintenanceStatus`.
+- Se cambiaron imports de servicios en casos de uso de mantenimiento a `import type` para evitar carga runtime innecesaria durante tests.
 
-## 8) Recomendación QA para cerrar gap
+## 6) Ejecución y resultados
 
-- Publicar o sincronizar ramas reales de Gemini y Claude para auditoría diferencial.
-- Establecer umbrales de cobertura obligatorios en CI (backend y frontend).
-- Añadir suite E2E mínima con Playwright para flujo crítico.
-- Añadir checklist de compliance de skills en PR template o pipeline.
+### Pruebas que pasan
+
+- `pnpm test` en `jaxon-core-api`: pasa (7/7 pruebas QA).
+- `pnpm test` en `jaxon-client`: pasa (4/4 pruebas QA).
+
+### Fallas estructurales aún presentes
+
+`pnpm build` en `jaxon-core-api` falla por problemas de base del repositorio, no solo por tests:
+
+- Dependencias faltantes/403 de descarga (`prisma`, `socket.io`, etc.).
+- Cliente Prisma generado ausente.
+- Inconsistencias entre exports/imports de rutas/controladores.
+- Tests legacy `*.spec.ts` con contratos incompatibles.
+
+## 7) Documentación y estado funcional
+
+- Se mantiene este informe actualizado con hallazgos y evidencia de ejecución.
+- El código de capa aplicación queda con pruebas reales ejecutables.
+- El sistema completo aún no cumple criterio de “build limpio integral” en backend por deuda técnica/integración.
+
+## 8) Qué está fallando (resumen ejecutivo)
+
+1. **No existen ramas Gemini/Claude** en el repo disponible.  
+2. **Suite legacy de tests (`*.spec.ts`) no confiable** por desacople con implementación real.  
+3. **Backend no compila de extremo a extremo** por dependencias/artefactos e inconsistencias de integración.  
+4. **Cumplimiento de skills no está institucionalizado** mediante validación en CI.
+
+## 9) Recomendación QA estricta para cierre
+
+1. Publicar/sincronizar ramas reales `gemini` y `claude` para auditoría diferencial.  
+2. Desactivar o migrar tests legacy inválidos a suite QA ejecutable y trazable.  
+3. Corregir pipeline backend: generación Prisma offline-compatible + dependencias bloqueadas + build gate obligatorio.  
+4. Añadir verificación de cumplimiento de skills (checklist o CI rule) para evitar regresión de calidad.

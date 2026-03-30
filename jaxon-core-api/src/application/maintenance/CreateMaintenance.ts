@@ -1,7 +1,7 @@
 import { Maintenance, MaintenanceStatus, MaintenanceType } from '../../domain/maintenance/Maintenance.js';
 import type { MaintenanceRepository } from '../../domain/maintenance/MaintenanceRepository.js';
 import { randomUUID } from 'crypto';
-import { WebSocketService } from '../../infrastructure/sockets/WebSocketService.js';
+import type { WebSocketService } from '../../infrastructure/sockets/WebSocketService.js';
 
 export interface CreateMaintenanceRequest {
   assetId: string;
@@ -13,8 +13,8 @@ export interface CreateMaintenanceRequest {
   createdBy: string;
 }
 
-import { AuditService } from '../../infrastructure/services/AuditService.js';
-import { Result } from 'better-result';
+import type { AuditService } from '../../infrastructure/services/AuditService.js';
+import { Result } from '../../domain/core/Result.js';
 import { InternalError } from '../../domain/core/errors.js';
 
 export class CreateMaintenance {
