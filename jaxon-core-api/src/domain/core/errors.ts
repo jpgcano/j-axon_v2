@@ -1,37 +1,38 @@
-import { TaggedError } from 'better-result';
+export class NotFoundError extends Error {
+  public readonly entity: string;
+  public readonly id: string;
 
-export class NotFoundError extends TaggedError('NotFoundError')<{
-  entity: string;
-  id: string;
-  message: string;
-}>() {
   constructor(args: { entity: string; id: string }) {
-    super({ ...args, message: `${args.entity} with ID ${args.id} not found` });
+    super(`${args.entity} with ID ${args.id} not found`);
+    this.name = 'NotFoundError';
+    this.entity = args.entity;
+    this.id = args.id;
   }
 }
 
-export class ValidationError extends TaggedError('ValidationError')<{
-  field: string;
-  message: string;
-}>() {
+export class ValidationError extends Error {
+  public readonly field: string;
+
   constructor(args: { field: string; message: string }) {
-    super(args);
+    super(args.message);
+    this.name = 'ValidationError';
+    this.field = args.field;
   }
 }
 
-export class UnauthorizedError extends TaggedError('UnauthorizedError')<{
-  message: string;
-}>() {
+export class UnauthorizedError extends Error {
   constructor(args: { message: string }) {
-    super(args);
+    super(args.message);
+    this.name = 'UnauthorizedError';
   }
 }
 
-export class InternalError extends TaggedError('InternalError')<{
-  message: string;
-  cause?: unknown;
-}>() {
+export class InternalError extends Error {
+  public readonly cause?: unknown;
+
   constructor(args: { message: string; cause?: unknown }) {
-    super(args);
+    super(args.message);
+    this.name = 'InternalError';
+    this.cause = args.cause;
   }
 }

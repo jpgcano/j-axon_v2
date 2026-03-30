@@ -1,8 +1,9 @@
-import { Maintenance, MaintenanceStatus } from './Maintenance.js';
+import type { Maintenance, MaintenanceStatus } from './Maintenance.js';
 
 export interface MaintenanceRepository {
   save(maintenance: Maintenance): Promise<void>;
   findById(id: string): Promise<Maintenance | null>;
+  findAll(): Promise<Maintenance[]>;
   findByAssetId(assetId: string): Promise<Maintenance[]>;
   findByStatus(status: MaintenanceStatus): Promise<Maintenance[]>;
   findByAssignedTech(techId: string): Promise<Maintenance[]>;
