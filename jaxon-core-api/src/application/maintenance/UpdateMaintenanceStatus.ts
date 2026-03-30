@@ -1,7 +1,7 @@
 import { Maintenance, MaintenanceStatus } from '../../domain/maintenance/Maintenance.js';
 import type { MaintenanceRepository } from '../../domain/maintenance/MaintenanceRepository.js';
 import { NotFoundException } from '../../domain/core/exceptions.js';
-import { WebSocketService } from '../../infrastructure/sockets/WebSocketService.js';
+import type { WebSocketService } from '../../infrastructure/sockets/WebSocketService.js';
 
 export interface UpdateMaintenanceStatusRequest {
   id: string;
@@ -9,8 +9,8 @@ export interface UpdateMaintenanceStatusRequest {
   actorId: string;
 }
 
-import { AuditService } from '../../infrastructure/services/AuditService.js';
-import { Result } from 'better-result';
+import type { AuditService } from '../../infrastructure/services/AuditService.js';
+import { Result } from '../../domain/core/Result.js';
 import { NotFoundError, InternalError } from '../../domain/core/errors.js';
 
 export class UpdateMaintenanceStatus {

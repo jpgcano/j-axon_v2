@@ -47,6 +47,18 @@ export class Maintenance {
     this.props.updatedAt = new Date();
   }
 
+  public start(updatedBy: string): void {
+    this.updateStatus(MaintenanceStatus.IN_PROGRESS, updatedBy);
+  }
+
+  public complete(updatedBy: string): void {
+    this.updateStatus(MaintenanceStatus.COMPLETED, updatedBy);
+  }
+
+  public cancel(updatedBy: string): void {
+    this.updateStatus(MaintenanceStatus.CANCELLED, updatedBy);
+  }
+
   public toPrimitives(): MaintenanceProps {
     return { ...this.props };
   }

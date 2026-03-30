@@ -8,7 +8,7 @@ export interface PredictMaintenanceRequest {
   ticketId?: string;
 }
 
-import { Result } from 'better-result';
+import { Result } from '../../domain/core/Result.js';
 import { NotFoundError, InternalError } from '../../domain/core/errors.js';
 
 export class PredictMaintenance {
