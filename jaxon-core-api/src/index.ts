@@ -3,7 +3,7 @@ import cors from 'cors';
 import { authRouter } from './presentation/auth/authRoutes.js';
 import { assetRouter } from './presentation/assets/assetRoutes.js';
 import { ticketRouter } from './presentation/tickets/ticketRoutes.js';
-import { maintenanceRouter } from './presentation/maintenance/maintenanceRoutes.js';
+import maintenanceRouter from './presentation/maintenance/maintenanceRoutes.js';
 import { errorHandler } from './presentation/middlewares/errorHandler.js';
 
 export const createApp = (): express.Express => {
@@ -20,6 +20,7 @@ export const createApp = (): express.Express => {
   app.use('/api/auth', authRouter);
   app.use('/api/assets', assetRouter);
   app.use('/api/tickets', ticketRouter);
+  app.use('/api/maintenance', maintenanceRouter);
 
   // Global Error Handler
   app.use(errorHandler);

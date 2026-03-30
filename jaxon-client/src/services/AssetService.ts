@@ -38,4 +38,5 @@ export const AssetService = {
   getAssets: () => api.get<Asset[]>('/assets'),
   getAssetById: (id: string) => api.get<Asset>(`/assets/${id}`),
   createAsset: (data: CreateAssetRequest) => api.post<Asset>('/assets', data),
+  updateAsset: (id: string, data: Partial<CreateAssetRequest>) => api.put<Asset>(`/assets/${id}`, data),
 };
