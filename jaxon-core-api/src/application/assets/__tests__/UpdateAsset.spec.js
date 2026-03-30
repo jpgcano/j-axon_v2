@@ -5,8 +5,12 @@ describe('UpdateAsset', () => {
     const mockAssetRepository = {
         findById: vi.fn(),
         save: vi.fn(),
+        findIntegrityHash: vi.fn(),
     };
-    const updateAsset = new UpdateAsset(mockAssetRepository);
+    const mockAuditLogger = {
+        logAction: vi.fn(),
+    };
+    const updateAsset = new UpdateAsset(mockAssetRepository, mockAuditLogger);
     it('should update an existing asset', async () => {
         const existingAsset = {
             props: {

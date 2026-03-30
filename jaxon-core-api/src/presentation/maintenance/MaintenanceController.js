@@ -2,6 +2,18 @@ import { CreateMaintenance } from '../../application/maintenance/CreateMaintenan
 import { ListMaintenance } from '../../application/maintenance/ListMaintenance.js';
 import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
 import { matchError } from 'better-result';
+import { z } from 'zod';
+const createMaintenanceSchema = z.object({
+    assetId: z.string().uuid(),
+    ticketId: z.string().uuid().nullable().optional(),
+    type: z.string(),
+    description: z.string().min(3),
+    scheduledDate: z.coerce.date(),
+    assignedTechId: z.string().uuid().nullable().optional(),
+}).strict();
+const updateMaintenanceStatusSchema = z.object({
+    status: z.string(),
+}).strict();
 export class MaintenanceController {
     createMaintenance;
     listMaintenance;
@@ -12,8 +24,9 @@ export class MaintenanceController {
         this.updateMaintenanceStatus = updateMaintenanceStatus;
     }
     async create(req, res) {
+        const data = createMaintenanceSchema.parse(req.body);
         const result = await this.createMaintenance.execute({
-            ...req.body,
+            ...data,
             createdBy: req.user.id,
         });
         result.match({
@@ -37,9 +50,10 @@ export class MaintenanceController {
         });
     }
     async updateStatus(req, res) {
+        const data = updateMaintenanceStatusSchema.parse(req.body);
         const result = await this.updateMaintenanceStatus.execute({
             id: req.params.id,
-            status: req.body.status,
+            status: data.status,
             actorId: req.user.id,
         });
         result.match({

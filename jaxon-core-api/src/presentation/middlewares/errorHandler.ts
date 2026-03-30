@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { DomainException, UnauthorizedException, InvalidArgumentException, NotFoundException } from '../../domain/core/exceptions.js';
+import { DomainException, UnauthorizedException, InvalidArgumentException, NotFoundException, ConflictException } from '../../domain/core/exceptions.js';
 import { ZodError } from 'zod';
 
 export function errorHandler(
@@ -22,6 +22,11 @@ export function errorHandler(
 
   if (err instanceof InvalidArgumentException) {
     res.status(400).json({ error: err.message, code: err.code });
+    return;
+  }
+
+  if (err instanceof ConflictException) {
+    res.status(409).json({ error: err.message, code: err.code });
     return;
   }
 

@@ -24,7 +24,7 @@
    - `authMiddleware.spec.ts` (6 tests): Missing header, malformed token, invalid token, Bearer format
 
 4. **Integration Tests**
-   - `AssetController.integration.spec.ts`: GET /api/assets, health check, 404s con Supertest
+   - `AssetController.integration.spec.ts`: GET /api/v1/assets, health check, 404s con Supertest
 
 ### Frontend Tests Migrados a Vitest:
 - `page.test.ts`: Onboarding messaging validation

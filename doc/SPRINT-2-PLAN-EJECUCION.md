@@ -125,7 +125,9 @@ Implementar sistema de **incidencias (tickets)** con **clasificación automátic
     - GET /api/v1/tickets (pública, autenticada)
     - GET /api/v1/tickets/:ticketId (pública, autenticada)
     - PATCH /api/v1/tickets/:ticketId/status (validar riesgo - si HIGH, denegar para TECH)
-    - PATCH /api/v1/tickets/:ticketId/approve (solo MANAGER/CRO)
+    - PATCH /api/v1/tickets/:ticketId/status (status=APPROVED, solo MANAGER/CRO)
+    - PATCH /api/v1/tickets/:ticketId/assign
+    - DELETE /api/v1/tickets/:ticketId
   - Middleware `requireTicketApprover` que valida:
     ```typescript
     // Si ticket.riskLevel >= HIGH && ticketStatus != APPROVED
@@ -137,8 +139,8 @@ Implementar sistema de **incidencias (tickets)** con **clasificación automátic
 - [ ] **DIA 4 - Noche**: Tests endpoint (Supertest/API)
   - `src/presentation/__tests__/TicketController.spec.ts` (10 casos)
     - POST /api/v1/tickets → 201
-    - PATCH /approve con MANAGER → 200
-    - PATCH /approve con TECH → 403
+    - PATCH /status (APPROVED) con MANAGER → 200
+    - PATCH /status (APPROVED) con TECH → 403
     - POST con datos inválidos → 400
     - GET listado filtra por rol TECH → solo asignados
   - Commit: `test(presentation): add TicketController integration tests`
@@ -170,7 +172,7 @@ Implementar sistema de **incidencias (tickets)** con **clasificación automátic
     - useTickets() → GET /api/v1/tickets (filtro por rol)
     - useTicket(ticketId) → GET /api/v1/tickets/{ticketId}
     - useCreateTicket() → POST /api/v1/tickets
-    - useApproveTicket() → PATCH /api/v1/tickets/{ticketId}/approve
+    - useApproveTicket() → PATCH /api/v1/tickets/{ticketId}/status (status=APPROVED)
     - useUpdateTicketStatus() → PATCH /api/v1/tickets/{ticketId}/status
     ```
   - Integración con AssetService (verificar asset exists)
@@ -447,7 +449,7 @@ e2e/
 - [ ] Página /dashboard/approvals:
   - Solo MANAGER/CRO/ADMIN pueden acceder (redirect si TECH)
   - Filtra PENDING_APPROVAL con riesgo HIGH/EXTREME
-  - Botón Aprobar ejecuta PATCH /approve
+  - Botón Aprobar ejecuta PATCH /status (status=APPROVED)
 - [ ] Componente RiskBadge renderiza colores correctos
 - [ ] Componente TicketForm valida campos
 
@@ -481,7 +483,9 @@ e2e/
   GET    /api/v1/tickets
   GET    /api/v1/tickets/{ticketId}
   PATCH  /api/v1/tickets/{ticketId}/status
-  PATCH  /api/v1/tickets/{ticketId}/approve
+  PATCH  /api/v1/tickets/{ticketId}/status (status=APPROVED)
+  PATCH  /api/v1/tickets/{ticketId}/assign
+  DELETE /api/v1/tickets/{ticketId}
   ```
 - [ ] CHANGELOG.md con resumen de cambios Sprint 2
 - [ ] Comentarios JSDoc en funciones públicas
@@ -583,7 +587,7 @@ e2e/
 ### Performance Baselines
 - GET /api/v1/tickets (100 tickets): <200ms
 - POST /api/v1/tickets: <100ms
-- PATCH /api/v1/tickets/{id}/approve: <100ms
+- PATCH /api/v1/tickets/{id}/status (status=APPROVED): <100ms
 - Frontend render /dashboard/tickets: <1s
 
 ---
@@ -698,4 +702,3 @@ git push origin feature/sprint-2-tickets
 **Sprint**: 2 de 6  
 **Status**: 🟢 LISTO PARA INICIAR  
 **Next Action**: Crear rama feature e iniciar Día 1
-

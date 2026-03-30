@@ -12,7 +12,7 @@ Este documento define las políticas, mecanismos y arquitecturas de seguridad qu
 El sistema operará bajo un modelo de autenticación sin estado (Stateless) basado en tokens, diseñado para mitigar ataques de falsificación de peticiones a sitios cruzados (CSRF) y robo de sesión (XSS).
 
 2.1. Ciclo de Vida de Tokens (JWT)
-- Access Token: Token JWT firmado asimétricamente (algoritmo RS256). Contiene únicamente el `sub` (UUID del usuario), el `role` y la fecha de expiración (`exp`). Tiempo de vida máximo: 15 minutos. Este token será inyectado por el Frontend en la cabecera `Authorization: Bearer`.
+- Access Token: Token JWT firmado asimétricamente (algoritmo RS256) cuando se dispone de `JWT_PRIVATE_KEY`/`JWT_PUBLIC_KEY`. En modo desarrollo, se permite HS256 con `JWT_SECRET`. Contiene únicamente el `sub` (UUID del usuario), el `role` y la fecha de expiración (`exp`). Tiempo de vida máximo: 15 minutos. Este token será inyectado por el Frontend en la cabecera `Authorization: Bearer`.
 - Refresh Token: Token opaco de larga duración (7 días). Se utilizará exclusivamente para emitir nuevos Access Tokens.
   - Almacenamiento Obligatorio: Debe ser enviado al cliente configurado estrictamente como una cookie `HttpOnly`, `Secure` (solo HTTPS) y `SameSite=Strict`. El código JavaScript del Frontend no debe tener acceso a este token bajo ninguna circunstancia.
 
@@ -49,6 +49,14 @@ Toda transacción de escritura (Mutación) debe calcular un hash criptográfico.
 - En Tránsito: Todo tráfico HTTP será forzado a TLS 1.3. Las conexiones a la base de datos PostgreSQL desde el backend también deben realizarse sobre canales encriptados (SSL Mode = Require).
 - En Reposo: Las contraseñas de los usuarios (si se utiliza autenticación local) deben ser procesadas utilizando el algoritmo Argon2id o bcrypt (costo mínimo de 12). Queda prohibido el almacenamiento de contraseñas en texto plano o usando algoritmos obsoletos (MD5, SHA1).
 
+4.3. Observabilidad de Auditoría
+Para asegurar cumplimiento de REQ-F3.1, el middleware de auditoría marca toda mutación (POST/PUT/PATCH/DELETE) como obligatoria de auditar y registra una advertencia si finaliza sin log.
+
+- Variable de entorno `AUDIT_ENFORCEMENT`:
+  - `off`: desactiva verificación.
+  - `soft` (default): log de advertencia.
+  - `hard`: log de error (sin bloquear la respuesta).
+
 5. SEGURIDAD PERIMETRAL Y PREVENCIÓN DE VULNERABILIDADES (OWASP)
 El código debe implementar controles sistemáticos contra las vulnerabilidades más críticas (OWASP Top 10):
 
@@ -61,7 +69,7 @@ Para mitigar ataques de denegación de servicio (DDoS) y fuerza bruta:
 - Endpoints de Autenticación (`/api/v1/auth/*`): Límite de 5 intentos fallidos por IP en una ventana de 15 minutos.
 - Endpoints de API Estándar: Límite de 300 peticiones por IP por minuto.
 - Si se excede el umbral, el servidor retornará HTTP 429 (Too Many Requests).
+Los límites son configurables mediante variables `RATE_LIMIT_AUTH_*` y `RATE_LIMIT_API_*`.
 
 5.3. Políticas de Intercambio de Recursos (CORS)
 El backend configurará cabeceras CORS restrictivas. El parámetro `Access-Control-Allow-Origin` debe apuntar única y exclusivamente al dominio oficial del Frontend en producción (ej. `https://app.j-axon.com`). El uso de comodines (`*`) está estrictamente prohibido en entornos de Staging y Producción.
-

@@ -17,37 +17,50 @@ export interface AssetProps {
 }
 
 export class Asset {
-  private props: AssetProps;
+  private _props: AssetProps;
 
   constructor(props: AssetProps) {
-    this.props = props;
+    this._props = { ...props };
   }
 
-  get id(): string { return this.props.id; }
-  get description(): string { return this.props.description; }
-  get category(): string { return this.props.category; }
-  get status(): AssetStatus { return this.props.status; }
-  get assignedTo(): string | null { return this.props.assignedTo; }
+  get id(): string { return this._props.id; }
+  get description(): string { return this._props.description; }
+  get category(): string { return this._props.category; }
+  get status(): AssetStatus { return this._props.status; }
+  get assignedTo(): string | null { return this._props.assignedTo; }
+  get props(): AssetProps { return { ...this._props }; }
 
-  public changeStatus(newStatus: AssetStatus, updatedBy: string): void {
-    this.props.status = newStatus;
-    this.props.updatedBy = updatedBy;
-    this.props.updatedAt = new Date();
+  public changeStatus(newStatus: AssetStatus, updatedBy?: string): void {
+    if (!Object.values(AssetStatus).includes(newStatus)) {
+      throw new Error(`Invalid asset status: ${newStatus}`);
+    }
+    this._props.status = newStatus;
+    if (updatedBy) {
+      this._props.updatedBy = updatedBy;
+    }
+    this._props.updatedAt = new Date();
   }
 
-  public assignTo(userId: string, updatedBy: string): void {
-    this.props.assignedTo = userId;
-    this.props.updatedBy = updatedBy;
-    this.props.updatedAt = new Date();
+  public assignTo(userId: string, updatedBy?: string): void {
+    if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+      throw new Error('Assigned user is required');
+    }
+    this._props.assignedTo = userId;
+    if (updatedBy) {
+      this._props.updatedBy = updatedBy;
+    }
+    this._props.updatedAt = new Date();
   }
 
-  public unassign(updatedBy: string): void {
-    this.props.assignedTo = null;
-    this.props.updatedBy = updatedBy;
-    this.props.updatedAt = new Date();
+  public unassign(updatedBy?: string): void {
+    this._props.assignedTo = null;
+    if (updatedBy) {
+      this._props.updatedBy = updatedBy;
+    }
+    this._props.updatedAt = new Date();
   }
 
   public toPrimitives(): AssetProps {
-    return { ...this.props };
+    return { ...this._props };
   }
 }

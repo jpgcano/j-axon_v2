@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '../../domain/core/exceptions.js';
 import { tokenService } from '../../infrastructure/di/container.js';
+import { setRequestActorId } from '../../infrastructure/context/RequestContext.js';
 export async function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -9,6 +10,7 @@ export async function authMiddleware(req, res, next) {
     try {
         const payload = await tokenService.verifyToken(token);
         req.user = { id: payload.userId, role: payload.role };
+        setRequestActorId(payload.userId);
         next();
     }
     catch (error) {

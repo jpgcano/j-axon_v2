@@ -15,8 +15,8 @@
  * - Risk = P × C → [1,25]
  * - Result: LOW (1-5), MEDIUM (6-12), HIGH (13-20), EXTREME (21-25)
  */
-import { RiskLevel } from './value-objects/RiskLevel';
-import { TicketStatus } from './value-objects/TicketStatus';
+import { RiskLevel } from './value-objects/RiskLevel.js';
+import { TicketStatus } from './value-objects/TicketStatus.js';
 export class Ticket {
     id;
     assetId;
@@ -112,6 +112,9 @@ export class Ticket {
         if (!this.status.canTransitionByRole(userRole)) {
             throw new Error(`User role ${userRole} cannot transition from ${this.status.getValue()} status`);
         }
+        if (newStatus.equals(TicketStatus.pendingApproval())) {
+            throw new Error('Cannot set status to PENDING_APPROVAL after creation');
+        }
         this.status = newStatus;
         this.updatedBy = updatedBy;
         this.updatedAt = new Date();
@@ -150,6 +153,10 @@ export class Ticket {
     getStatus() { return this.status; }
     getAssignedTechId() { return this.assignedTechId; }
     getApprovedById() { return this.approvedById; }
+    getCreatedBy() { return this.createdBy; }
+    getUpdatedBy() { return this.updatedBy; }
+    getCreatedAt() { return this.createdAt; }
+    getUpdatedAt() { return this.updatedAt; }
     /**
      * Convert to primitive values
      */

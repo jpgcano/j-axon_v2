@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AssetController } from '../AssetController.js';
+import { AssetController } from '../assets/AssetController.js';
 import { z } from 'zod';
 describe('AssetController Integration', () => {
     let assetController;
@@ -7,12 +7,18 @@ describe('AssetController Integration', () => {
     let listAssetsMock;
     let getAssetMock;
     let updateAssetMock;
+    let assignAssetMock;
+    let updateAssetStatusMock;
+    let unassignAssetMock;
     beforeEach(() => {
         createAssetMock = { execute: vi.fn() };
         listAssetsMock = { execute: vi.fn() };
         getAssetMock = { execute: vi.fn() };
         updateAssetMock = { execute: vi.fn() };
-        assetController = new AssetController(createAssetMock, listAssetsMock, getAssetMock, updateAssetMock);
+        assignAssetMock = { execute: vi.fn() };
+        updateAssetStatusMock = { execute: vi.fn() };
+        unassignAssetMock = { execute: vi.fn() };
+        assetController = new AssetController(createAssetMock, listAssetsMock, getAssetMock, updateAssetMock, assignAssetMock, updateAssetStatusMock, unassignAssetMock);
     });
     describe('create', () => {
         it('should return 201 and asset data on success', async () => {

@@ -8,9 +8,10 @@
  * - Enforce data consistency via transactions
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../generated/prisma/client.js';
 import { Ticket, TicketPrimitives, TicketRepository } from '../../../domain/tickets/index.js';
 import { TicketStatus } from '../../../domain/tickets/value-objects/TicketStatus.js';
+import { getRequestContext } from '../../context/RequestContext.js';
 
 export class PrismaTicketRepository implements TicketRepository {
   constructor(private prisma: PrismaClient) {}
@@ -34,7 +35,7 @@ export class PrismaTicketRepository implements TicketRepository {
         updated_by: primitives.updatedBy,
         created_at: primitives.createdAt,
         updated_at: primitives.updatedAt,
-        ip_origin: '0.0.0.0/0', // TODO: get from request context
+        ip_origin: getRequestContext().ipOrigin || '0.0.0.0',
         integrity_hash: this.calculateHash(primitives),
       },
       update: {

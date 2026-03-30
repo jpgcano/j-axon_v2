@@ -161,7 +161,9 @@ ticket.canBeModifiedBy('ADMIN') → true (always)
 1. **Días 4-5**: Implementar TicketController y endpoints REST
    - POST /api/v1/tickets (crear)
    - GET /api/v1/tickets (listar)
-   - PATCH /api/v1/tickets/{id}/approve (aprobar)
+   - PATCH /api/v1/tickets/{id}/status (status=APPROVED)
+   - PATCH /api/v1/tickets/{id}/assign
+   - DELETE /api/v1/tickets/{id}
 
 2. **Días 6-8**: Frontend hooks + pages
 
@@ -193,4 +195,3 @@ e9cd50b feat(tests): add Ticket domain entity comprehensive test suite (8 cases)
 **Estado Final**: ✅ SPRINT 2 - DÍAS 1-3 COMPLETADOS  
 **Próxima Sesión**: Iniciar Días 4-5 (TicketController + Endpoints)  
 **Tiempo Estimado Restante**: 5-6 días de desarrollo
-

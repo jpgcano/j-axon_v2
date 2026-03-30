@@ -5,32 +5,45 @@ export var AssetStatus;
     AssetStatus["RETIRED"] = "RETIRED";
 })(AssetStatus || (AssetStatus = {}));
 export class Asset {
-    props;
+    _props;
     constructor(props) {
-        this.props = props;
+        this._props = { ...props };
     }
-    get id() { return this.props.id; }
-    get description() { return this.props.description; }
-    get category() { return this.props.category; }
-    get status() { return this.props.status; }
-    get assignedTo() { return this.props.assignedTo; }
+    get id() { return this._props.id; }
+    get description() { return this._props.description; }
+    get category() { return this._props.category; }
+    get status() { return this._props.status; }
+    get assignedTo() { return this._props.assignedTo; }
+    get props() { return { ...this._props }; }
     changeStatus(newStatus, updatedBy) {
-        this.props.status = newStatus;
-        this.props.updatedBy = updatedBy;
-        this.props.updatedAt = new Date();
+        if (!Object.values(AssetStatus).includes(newStatus)) {
+            throw new Error(`Invalid asset status: ${newStatus}`);
+        }
+        this._props.status = newStatus;
+        if (updatedBy) {
+            this._props.updatedBy = updatedBy;
+        }
+        this._props.updatedAt = new Date();
     }
     assignTo(userId, updatedBy) {
-        this.props.assignedTo = userId;
-        this.props.updatedBy = updatedBy;
-        this.props.updatedAt = new Date();
+        if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+            throw new Error('Assigned user is required');
+        }
+        this._props.assignedTo = userId;
+        if (updatedBy) {
+            this._props.updatedBy = updatedBy;
+        }
+        this._props.updatedAt = new Date();
     }
     unassign(updatedBy) {
-        this.props.assignedTo = null;
-        this.props.updatedBy = updatedBy;
-        this.props.updatedAt = new Date();
+        this._props.assignedTo = null;
+        if (updatedBy) {
+            this._props.updatedBy = updatedBy;
+        }
+        this._props.updatedAt = new Date();
     }
     toPrimitives() {
-        return { ...this.props };
+        return { ...this._props };
     }
 }
 //# sourceMappingURL=Asset.js.map

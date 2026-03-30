@@ -41,7 +41,9 @@ POST   /api/v1/tickets                      ← Crear
 GET    /api/v1/tickets                      ← Listar (filtro por rol)
 GET    /api/v1/tickets/{ticketId}           ← Detalle
 PATCH  /api/v1/tickets/{ticketId}/status    ← Cambiar estado
-PATCH  /api/v1/tickets/{ticketId}/approve   ← Aprobar (MANAGER/CRO)
+PATCH  /api/v1/tickets/{ticketId}/status    ← Aprobar (status=APPROVED, MANAGER/CRO)
+PATCH  /api/v1/tickets/{ticketId}/assign    ← Asignar técnico
+DELETE /api/v1/tickets/{ticketId}           ← Cerrar
 ```
 
 ### Frontend (21 SP)
@@ -101,8 +103,8 @@ Validar Coverage ≥85%
 - [ ] Integrar en DI Container
 - [ ] Tests API: `TicketController.spec.ts` (10+ casos)
   - Test: POST /tickets → 201
-  - Test: PATCH /approve (TECH) → 403
-  - Test: PATCH /approve (MANAGER) → 200
+  - Test: PATCH /status (APPROVED, TECH) → 403
+  - Test: PATCH /status (APPROVED, MANAGER) → 200
 - [ ] Build: `pnpm build` sin errores
 - [ ] Coverage: `pnpm test:coverage` ≥85%
 
@@ -133,7 +135,7 @@ Validar Coverage ≥85%
   - Columnas: ID, Activo, Título, Riesgo (badge), Estado
 - [ ] `/dashboard/tickets/create/page.tsx` (formulario con TicketForm)
 - [ ] `/dashboard/approvals/page.tsx` (solo MANAGER/CRO, filtra PENDING_APPROVAL + HIGH/EXTREME)
-  - Botón "Aprobar" → PATCH /approve
+  - Botón "Aprobar" → PATCH /status (APPROVED)
 - [ ] Tests pages (10+ casos)
 
 **Commit**: `feat(pages): add Ticket dashboard views`
@@ -308,4 +310,3 @@ git push origin v2.0.0-sprint-2
 **Status**: 🟢 LISTO PARA INICIAR  
 **Próximo**: Crear rama `feature/sprint-2-tickets` e iniciar Día 1  
 **Documento**: `/doc/SPRINT-2-PLAN-EJECUCION.md`
-

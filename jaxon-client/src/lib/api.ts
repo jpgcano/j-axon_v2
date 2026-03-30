@@ -1,6 +1,6 @@
 import { useAuthStore } from '../store/authStore';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
 export class ApiError extends Error {
   constructor(public status: number, public message: string) {

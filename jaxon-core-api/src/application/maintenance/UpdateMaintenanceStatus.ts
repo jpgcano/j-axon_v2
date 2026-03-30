@@ -12,6 +12,8 @@ export interface UpdateMaintenanceStatusRequest {
 import { AuditService } from '../../infrastructure/services/AuditService.js';
 import { Result } from 'better-result';
 import { NotFoundError, InternalError } from '../../domain/core/errors.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
 
 export class UpdateMaintenanceStatus {
   constructor(
@@ -47,11 +49,11 @@ export class UpdateMaintenanceStatus {
         await this.auditService.recordAction({
           entityName: 'jaxon_maintenance',
           entityId: request.id,
-          action: `UPDATE_STATUS_${request.status}`,
+          action: AuditActionType.UPDATE_STATUS,
           payloadBefore,
           payloadAfter,
           actorId: request.actorId,
-          ipOrigin: '127.0.0.1',
+          ipOrigin: getRequestContext().ipOrigin || '0.0.0.0',
         });
 
         // Emit Real-Time Event

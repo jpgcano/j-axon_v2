@@ -24,4 +24,10 @@ export class InvalidArgumentException extends DomainException {
         this.name = 'InvalidArgumentException';
     }
 }
+export class ConflictException extends DomainException {
+    constructor(message) {
+        super(message, 'CONFLICT');
+        this.name = 'ConflictException';
+    }
+}
 //# sourceMappingURL=exceptions.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"AuditMonitor.d.ts","sourceRoot":"","sources":["AuditMonitor.ts"],"names":[],"mappings":"AAAA,KAAK,iBAAiB,GAAG;IACvB,MAAM,EAAE,MAAM,CAAC;IACf,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,CAAC,EAAE,MAAM,CAAC;IACjB,SAAS,EAAE,MAAM,CAAC;CACnB,CAAC;AAKF,wBAAgB,kBAAkB,CAAC,KAAK,EAAE,iBAAiB,GAAG,IAAI,CAGjE;AAED,wBAAgB,qBAAqB;;;EAKpC"}

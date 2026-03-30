@@ -8,25 +8,37 @@ describe('RegisterUser', () => {
     const mockPasswordHasher = {
         hash: vi.fn(),
     };
-    const registerUser = new RegisterUser(mockUserRepository, mockPasswordHasher);
+    const mockAuditLogger = {
+        logAction: vi.fn(),
+    };
+    const registerUser = new RegisterUser(mockUserRepository, mockPasswordHasher, mockAuditLogger);
     it('should register a new user', async () => {
-        const user = {
+        const request = {
+            id: 'user-1',
             email: 'test@example.com',
-            password: 'password123',
+            passwordPlain: 'password123',
             role: 'TECH',
+            systemIp: '127.0.0.1',
         };
         mockUserRepository.findByEmail.mockResolvedValue(null);
         mockPasswordHasher.hash.mockResolvedValue('hashedPassword');
-        mockUserRepository.save.mockResolvedValue({ id: 'user-1', ...user, password: 'hashedPassword' });
-        const result = await registerUser.execute(user);
+        mockUserRepository.save.mockResolvedValue(undefined);
+        await registerUser.execute(request);
         expect(mockUserRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
         expect(mockPasswordHasher.hash).toHaveBeenCalledWith('password123');
         expect(mockUserRepository.save).toHaveBeenCalled();
-        expect(result.email).toBe('test@example.com');
+        const savedUser = mockUserRepository.save.mock.calls[0][0];
+        expect(savedUser.email).toBe('test@example.com');
     });
     it('should throw error if user already exists', async () => {
         mockUserRepository.findByEmail.mockResolvedValue({ email: 'test@example.com' });
-        await expect(registerUser.execute({ email: 'test@example.com', password: 'pass', role: 'TECH' })).rejects.toThrow('User already exists');
+        await expect(registerUser.execute({
+            id: 'user-2',
+            email: 'test@example.com',
+            passwordPlain: 'pass',
+            role: 'TECH',
+            systemIp: '127.0.0.1',
+        })).rejects.toThrow('User with email test@example.com already exists');
     });
 });
 //# sourceMappingURL=RegisterUser.spec.js.map

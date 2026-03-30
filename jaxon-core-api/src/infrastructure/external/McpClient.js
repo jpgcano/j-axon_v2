@@ -2,7 +2,7 @@ import CircuitBreaker from 'opossum';
 export class McpClient {
     breaker;
     baseUrl;
-    constructor(baseUrl = process.env.AI_SIDECAR_URL || 'http://localhost:5000') {
+    constructor(baseUrl = process.env.MCP_SIDECAR_URL || process.env.AI_SIDECAR_URL || 'http://localhost:5000') {
         this.baseUrl = baseUrl;
         const options = {
             timeout: 3000, // 3 seconds

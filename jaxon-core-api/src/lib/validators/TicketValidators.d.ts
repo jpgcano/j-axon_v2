@@ -17,10 +17,10 @@ export declare const CreateTicketRequestSchema: z.ZodObject<{
 export type CreateTicketRequest = z.infer<typeof CreateTicketRequestSchema>;
 export declare const UpdateTicketStatusRequestSchema: z.ZodObject<{
     status: z.ZodEnum<{
+        CLOSED: "CLOSED";
+        APPROVED: "APPROVED";
         IN_PROGRESS: "IN_PROGRESS";
         RESOLVED: "RESOLVED";
-        APPROVED: "APPROVED";
-        CLOSED: "CLOSED";
     }>;
 }, z.core.$strip>;
 export type UpdateTicketStatusRequest = z.infer<typeof UpdateTicketStatusRequestSchema>;
@@ -34,17 +34,17 @@ export declare const GetTicketParamsSchema: z.ZodObject<{
 export type GetTicketParams = z.infer<typeof GetTicketParamsSchema>;
 export declare const ListTicketsQuerySchema: z.ZodObject<{
     riskLevel: z.ZodOptional<z.ZodEnum<{
-        LOW: "LOW";
         HIGH: "HIGH";
-        EXTREME: "EXTREME";
+        LOW: "LOW";
         MEDIUM: "MEDIUM";
+        EXTREME: "EXTREME";
     }>>;
     status: z.ZodOptional<z.ZodEnum<{
+        CLOSED: "CLOSED";
         PENDING_APPROVAL: "PENDING_APPROVAL";
+        APPROVED: "APPROVED";
         IN_PROGRESS: "IN_PROGRESS";
         RESOLVED: "RESOLVED";
-        APPROVED: "APPROVED";
-        CLOSED: "CLOSED";
     }>>;
     assetId: z.ZodOptional<z.ZodString>;
     limit: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
@@ -59,17 +59,17 @@ export declare const TicketResponseSchema: z.ZodObject<{
     probability: z.ZodNumber;
     consequence: z.ZodNumber;
     riskLevel: z.ZodEnum<{
-        LOW: "LOW";
         HIGH: "HIGH";
-        EXTREME: "EXTREME";
+        LOW: "LOW";
         MEDIUM: "MEDIUM";
+        EXTREME: "EXTREME";
     }>;
     status: z.ZodEnum<{
+        CLOSED: "CLOSED";
         PENDING_APPROVAL: "PENDING_APPROVAL";
+        APPROVED: "APPROVED";
         IN_PROGRESS: "IN_PROGRESS";
         RESOLVED: "RESOLVED";
-        APPROVED: "APPROVED";
-        CLOSED: "CLOSED";
     }>;
     assignedTechId: z.ZodNullable<z.ZodString>;
     approvedById: z.ZodNullable<z.ZodString>;

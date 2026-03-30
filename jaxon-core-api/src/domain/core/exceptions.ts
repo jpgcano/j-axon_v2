@@ -28,3 +28,10 @@ export class InvalidArgumentException extends DomainException {
     this.name = 'InvalidArgumentException';
   }
 }
+
+export class ConflictException extends DomainException {
+  constructor(message: string) {
+    super(message, 'CONFLICT');
+    this.name = 'ConflictException';
+  }
+}

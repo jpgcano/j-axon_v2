@@ -4,6 +4,20 @@ import { ListMaintenance } from '../../application/maintenance/ListMaintenance.j
 import { UpdateMaintenanceStatus } from '../../application/maintenance/UpdateMaintenanceStatus.js';
 
 import { matchError } from 'better-result';
+import { z } from 'zod';
+
+const createMaintenanceSchema = z.object({
+  assetId: z.string().uuid(),
+  ticketId: z.string().uuid().nullable().optional(),
+  type: z.string(),
+  description: z.string().min(3),
+  scheduledDate: z.coerce.date(),
+  assignedTechId: z.string().uuid().nullable().optional(),
+}).strict();
+
+const updateMaintenanceStatusSchema = z.object({
+  status: z.string(),
+}).strict();
 
 export class MaintenanceController {
   constructor(
@@ -13,8 +27,9 @@ export class MaintenanceController {
   ) {}
 
   public async create(req: Request, res: Response): Promise<void> {
+    const data = createMaintenanceSchema.parse(req.body);
     const result = await this.createMaintenance.execute({
-      ...req.body,
+      ...data,
       createdBy: (req as any).user.id,
     });
 
@@ -42,9 +57,10 @@ export class MaintenanceController {
   }
 
   public async updateStatus(req: Request, res: Response): Promise<void> {
+    const data = updateMaintenanceStatusSchema.parse(req.body);
     const result = await this.updateMaintenanceStatus.execute({
       id: req.params.id as string,
-      status: req.body.status,
+      status: data.status,
       actorId: (req as any).user.id,
     });
 

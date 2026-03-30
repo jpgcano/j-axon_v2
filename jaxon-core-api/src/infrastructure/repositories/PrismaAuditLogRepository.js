@@ -25,7 +25,10 @@ export class PrismaAuditLogRepository {
     async findLastByEntity(entityName) {
         const row = await this.prisma.jaxonAuditLog.findFirst({
             where: { entity_table: entityName },
-            orderBy: { created_at: 'desc' },
+            orderBy: [
+                { created_at: 'desc' },
+                { id_log: 'desc' },
+            ],
         });
         if (!row)
             return null;
@@ -33,7 +36,10 @@ export class PrismaAuditLogRepository {
     }
     async findLastGlobal() {
         const row = await this.prisma.jaxonAuditLog.findFirst({
-            orderBy: { created_at: 'desc' },
+            orderBy: [
+                { created_at: 'desc' },
+                { id_log: 'desc' },
+            ],
         });
         if (!row)
             return null;
@@ -41,7 +47,10 @@ export class PrismaAuditLogRepository {
     }
     async findAll() {
         const rows = await this.prisma.jaxonAuditLog.findMany({
-            orderBy: { created_at: 'desc' },
+            orderBy: [
+                { created_at: 'desc' },
+                { id_log: 'desc' },
+            ],
         });
         return rows.map(this.mapToDomain);
     }

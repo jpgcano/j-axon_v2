@@ -10,7 +10,7 @@ export class McpClient {
   private readonly breaker: CircuitBreaker<[any], AIResponse>;
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = process.env.AI_SIDECAR_URL || 'http://localhost:5000') {
+  constructor(baseUrl: string = process.env.MCP_SIDECAR_URL || process.env.AI_SIDECAR_URL || 'http://localhost:5000') {
     this.baseUrl = baseUrl;
     
     const options = {

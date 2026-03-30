@@ -63,7 +63,7 @@
 ### Integration Tests
 | Archivo | Tests | Cobertura |
 |---------|-------|-----------|
-| AssetController.integration.spec.ts | 3 | GET /api/assets, health, 404 |
+| AssetController.integration.spec.ts | 3 | GET /api/v1/assets, health, 404 |
 
 ### Frontend Tests (Migrados a Vitest)
 | Archivo | Tests | Cobertura |

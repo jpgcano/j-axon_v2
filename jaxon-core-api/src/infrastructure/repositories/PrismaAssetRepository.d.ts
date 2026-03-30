@@ -9,5 +9,6 @@ export declare class PrismaAssetRepository implements AssetRepository {
     findById(id: string): Promise<Asset | null>;
     findAll(): Promise<Asset[]>;
     findByAssignedUser(userId: string): Promise<Asset[]>;
+    findIntegrityHash(id: string): Promise<string | null>;
 }
 //# sourceMappingURL=PrismaAssetRepository.d.ts.map

@@ -3,12 +3,14 @@ import { Ticket } from '../../domain/tickets/Ticket.js';
 import type { TicketRepository } from '../../domain/tickets/TicketRepository.js';
 import { NotFoundException } from '../../domain/core/exceptions.js';
 import type { AuditLogger } from '../audit/AuditLogger.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
 
 export interface UpdateTicketStatusRequest {
   id: string;
   status: TicketStatus;
   actorId: string;
-  userRole: string; // ADMIN|MANAGER|TECH|AUDITOR
+  userRole: 'ADMIN' | 'MANAGER' | 'TECH' | 'AUDITOR';
 }
 
 export class UpdateTicketStatus {
@@ -38,11 +40,11 @@ export class UpdateTicketStatus {
     await this.auditLogger.logAction({
       entityTable: 'jaxon_tickets',
       entityId: request.id,
-      actionType: 'UPDATE_STATUS',
+      actionType: AuditActionType.UPDATE_STATUS,
       payloadBefore,
       payloadAfter,
       actorId: request.actorId,
-      ipOrigin: '0.0.0.0/0', // TODO: get from request context
+      ipOrigin: getRequestContext().ipOrigin || '0.0.0.0',
     });
 
     return ticket;

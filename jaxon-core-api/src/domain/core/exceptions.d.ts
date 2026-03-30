@@ -11,4 +11,7 @@ export declare class UnauthorizedException extends DomainException {
 export declare class InvalidArgumentException extends DomainException {
     constructor(message: string);
 }
+export declare class ConflictException extends DomainException {
+    constructor(message: string);
+}
 //# sourceMappingURL=exceptions.d.ts.map

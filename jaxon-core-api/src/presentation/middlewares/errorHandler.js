@@ -1,4 +1,4 @@
-import { DomainException, UnauthorizedException, InvalidArgumentException, NotFoundException } from '../../domain/core/exceptions.js';
+import { DomainException, UnauthorizedException, InvalidArgumentException, NotFoundException, ConflictException } from '../../domain/core/exceptions.js';
 import { ZodError } from 'zod';
 export function errorHandler(err, req, res, next) {
     console.error(`[ERROR] ${req.method} ${req.url} - ${err.message}`);
@@ -12,6 +12,10 @@ export function errorHandler(err, req, res, next) {
     }
     if (err instanceof InvalidArgumentException) {
         res.status(400).json({ error: err.message, code: err.code });
+        return;
+    }
+    if (err instanceof ConflictException) {
+        res.status(409).json({ error: err.message, code: err.code });
         return;
     }
     if (err instanceof DomainException) {

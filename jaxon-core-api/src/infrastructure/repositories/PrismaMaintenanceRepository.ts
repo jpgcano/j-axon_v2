@@ -2,6 +2,7 @@ import { Maintenance, MaintenanceStatus, MaintenanceType } from '../../domain/ma
 import type { MaintenanceRepository } from '../../domain/maintenance/MaintenanceRepository.js';
 import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { createHash } from 'crypto';
+import { getRequestContext } from '../context/RequestContext.js';
 
 export class PrismaMaintenanceRepository implements MaintenanceRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -39,7 +40,7 @@ export class PrismaMaintenanceRepository implements MaintenanceRepository {
         updated_by: props.updatedBy,
         created_at: props.createdAt,
         updated_at: props.updatedAt,
-        ip_origin: '127.0.0.1', 
+        ip_origin: getRequestContext().ipOrigin || '0.0.0.0',
         integrity_hash: integrityHash,
       },
     });

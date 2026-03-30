@@ -1,0 +1,43 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { DeactivateUser } from '../DeactivateUser.js';
+import { User, UserRole } from '../../../domain/users/User.js';
+import { NotFoundException, InvalidArgumentException } from '../../../domain/core/exceptions.js';
+describe('DeactivateUser', () => {
+    const userRepository = {
+        findById: vi.fn(),
+        save: vi.fn(),
+    };
+    const auditLogger = {
+        logAction: vi.fn(),
+    };
+    let useCase;
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useCase = new DeactivateUser(userRepository, auditLogger);
+    });
+    it('should deactivate user and audit', async () => {
+        const user = new User({
+            id: 'user-1',
+            email: 'test@example.com',
+            passwordHash: 'hash',
+            role: UserRole.TECH,
+            isActive: true,
+            createdBy: 'admin',
+            updatedBy: 'admin',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        userRepository.findById.mockResolvedValue(user);
+        await useCase.execute({ id: 'user-1', actorId: 'admin', userRole: 'ADMIN' });
+        expect(userRepository.save).toHaveBeenCalled();
+        expect(auditLogger.logAction).toHaveBeenCalled();
+    });
+    it('should throw if role not allowed', async () => {
+        await expect(useCase.execute({ id: 'user-1', actorId: 'tech', userRole: 'TECH' })).rejects.toBeInstanceOf(InvalidArgumentException);
+    });
+    it('should throw if user not found', async () => {
+        userRepository.findById.mockResolvedValue(null);
+        await expect(useCase.execute({ id: 'missing', actorId: 'admin', userRole: 'ADMIN' })).rejects.toBeInstanceOf(NotFoundException);
+    });
+});
+//# sourceMappingURL=DeactivateUser.spec.js.map

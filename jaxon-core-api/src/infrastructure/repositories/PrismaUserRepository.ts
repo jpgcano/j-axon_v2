@@ -2,6 +2,7 @@ import { PrismaClient } from '../../../generated/prisma/client.js';
 import { createHash } from 'crypto';
 import { User, UserRole } from '../../domain/users/User.js';
 import type { UserRepository } from '../../domain/users/UserRepository.js';
+import { getRequestContext } from '../context/RequestContext.js';
 
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -14,9 +15,7 @@ export class PrismaUserRepository implements UserRepository {
   public async save(user: User): Promise<void> {
     const props = user.toPrimitives();
     
-    // In a real application, ipOrigin would come from a Request Context (AsyncLocalStorage)
-    // Using a system default for now to satisfy the DB constraint
-    const systemIp = '127.0.0.1';
+    const systemIp = getRequestContext().ipOrigin || '0.0.0.0';
     
     const integrityHash = this.generateIntegrityHash(props.id, props.email, props.updatedAt);
 

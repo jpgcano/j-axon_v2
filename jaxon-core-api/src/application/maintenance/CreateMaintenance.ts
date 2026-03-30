@@ -16,6 +16,8 @@ export interface CreateMaintenanceRequest {
 import { AuditService } from '../../infrastructure/services/AuditService.js';
 import { Result } from 'better-result';
 import { InternalError } from '../../domain/core/errors.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
 
 export class CreateMaintenance {
   constructor(
@@ -52,10 +54,10 @@ export class CreateMaintenance {
         await this.auditService.recordAction({
           entityName: 'jaxon_maintenance',
           entityId: maintenancePrimitives.id,
-          action: 'CREATE',
+          action: AuditActionType.CREATE,
           payloadAfter: maintenancePrimitives,
           actorId: request.createdBy,
-          ipOrigin: '127.0.0.1',
+          ipOrigin: getRequestContext().ipOrigin || '0.0.0.0',
         });
 
         // Emit Real-Time Event

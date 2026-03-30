@@ -6,6 +6,7 @@ import type { AssetRepository } from '../../../domain/assets/AssetRepository.js'
 describe('CreateAsset Use Case', () => {
   let assetRepository: AssetRepository;
   let createAsset: CreateAsset;
+  let auditLogger: { logAction: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     assetRepository = {
@@ -14,8 +15,10 @@ describe('CreateAsset Use Case', () => {
       findAll: vi.fn(),
       findByStatus: vi.fn(),
       findByAssignee: vi.fn(),
+      findIntegrityHash: vi.fn(),
     } as any;
-    createAsset = new CreateAsset(assetRepository);
+    auditLogger = { logAction: vi.fn().mockResolvedValue(undefined) };
+    createAsset = new CreateAsset(assetRepository, auditLogger as any);
   });
 
   describe('execute', () => {
@@ -35,6 +38,7 @@ describe('CreateAsset Use Case', () => {
       expect(asset.props.createdBy).toBe('user-uuid');
       expect(asset.props.updatedBy).toBe('user-uuid');
       expect(assetRepository.save).toHaveBeenCalledTimes(1);
+      expect(auditLogger.logAction).toHaveBeenCalledTimes(1);
     });
 
     it('should create an asset with custom status when provided', async () => {

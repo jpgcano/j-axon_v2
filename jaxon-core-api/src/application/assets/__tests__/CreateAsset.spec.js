@@ -4,6 +4,7 @@ import { AssetStatus } from '../../../domain/assets/Asset.js';
 describe('CreateAsset Use Case', () => {
     let assetRepository;
     let createAsset;
+    let auditLogger;
     beforeEach(() => {
         assetRepository = {
             save: vi.fn().mockResolvedValue(undefined),
@@ -11,8 +12,10 @@ describe('CreateAsset Use Case', () => {
             findAll: vi.fn(),
             findByStatus: vi.fn(),
             findByAssignee: vi.fn(),
+            findIntegrityHash: vi.fn(),
         };
-        createAsset = new CreateAsset(assetRepository);
+        auditLogger = { logAction: vi.fn().mockResolvedValue(undefined) };
+        createAsset = new CreateAsset(assetRepository, auditLogger);
     });
     describe('execute', () => {
         it('should successfully create a new asset with default ACTIVE status', async () => {
@@ -29,6 +32,7 @@ describe('CreateAsset Use Case', () => {
             expect(asset.props.createdBy).toBe('user-uuid');
             expect(asset.props.updatedBy).toBe('user-uuid');
             expect(assetRepository.save).toHaveBeenCalledTimes(1);
+            expect(auditLogger.logAction).toHaveBeenCalledTimes(1);
         });
         it('should create an asset with custom status when provided', async () => {
             const request = {

@@ -28,6 +28,10 @@ Queda estrictamente prohibido versionar archivos `.env` en los repositorios de c
 - `JWT_PUBLIC_KEY`: Llave RSA para verificación.
 - `MASTER_SALT_HASH`: Cadena alfanumérica de 64 caracteres de alta entropía. Crítica para el cálculo del `integrity_hash`.
 - `MCP_SIDECAR_URL`: URL interna del contenedor IA (ej. `http://mcp-sidecar.internal:9000`).
+- `AUDIT_ENFORCEMENT`: Control de observabilidad de auditoría (`off`, `soft`, `hard`). Default: `soft`.
+- `AUDIT_HEALTH_DETAIL`: Si es `on`, expone métricas de auditoría en `/api/v1/health`.
+- `RATE_LIMIT_AUTH_WINDOW_MS`, `RATE_LIMIT_AUTH_MAX`: Ventana y máximo para `/api/v1/auth/*`.
+- `RATE_LIMIT_API_WINDOW_MS`, `RATE_LIMIT_API_MAX`: Ventana y máximo para API general.
 
 3.2. Client (Frontend) - Variables Obligatorias
 - `NEXT_PUBLIC_API_URL`: URL pública del API Gateway (ej. `https://api.j-axon.com/v1`).
@@ -72,3 +76,28 @@ El equipo SRE debe configurar alertas automatizadas que notifiquen al canal de i
 - Tasa de Errores HTTP 5xx: Si supera el 1% en una ventana de 5 minutos.
 - Consumo de Recursos: CPU o RAM de la base de datos superior al 85%.
 - Eventos de Seguridad: Más de 10 eventos `HASH_MISMATCH` o `RBAC_DENIED` en menos de 10 minutos (posible ataque en curso).
+- Auditoría: `missingAuditCount` > 0 durante una ventana de 5 minutos (posible omisión de trazabilidad).
+
+6.2. Validación de Integraciones Externas
+- Ejecutar `pnpm run validate:external` en `jaxon-core-api`.
+- Validar conectividad con MCP Sidecar y verificación de JWT (RS256 o HS256 en dev).
+
+6.1. Salud del Servicio (Health Check)
+- Endpoint: `GET /api/v1/health`
+- Respuesta esperada:
+```json
+{
+  "status": "ok",
+  "service": "jaxon-core-api"
+}
+```
+
+Si `AUDIT_HEALTH_DETAIL=on`, el endpoint agrega:
+```json
+{
+  "audit": {
+    "missingAuditCount": 0,
+    "lastMissingEvent": null
+  }
+}
+```

@@ -185,6 +185,10 @@ export class Ticket {
       throw new Error(`User role ${userRole} cannot transition from ${this.status.getValue()} status`);
     }
 
+    if (newStatus.equals(TicketStatus.pendingApproval())) {
+      throw new Error('Cannot set status to PENDING_APPROVAL after creation');
+    }
+
     this.status = newStatus;
     this.updatedBy = updatedBy;
     this.updatedAt = new Date();
@@ -225,6 +229,10 @@ export class Ticket {
   getStatus(): TicketStatus { return this.status; }
   getAssignedTechId(): string | null { return this.assignedTechId; }
   getApprovedById(): string | null { return this.approvedById; }
+  getCreatedBy(): string { return this.createdBy; }
+  getUpdatedBy(): string { return this.updatedBy; }
+  getCreatedAt(): Date { return this.createdAt; }
+  getUpdatedAt(): Date { return this.updatedAt; }
 
   /**
    * Convert to primitive values

@@ -2,6 +2,7 @@ import type { PrismaClient } from '../../../generated/prisma/client.js';
 import { createHash } from 'crypto';
 import { Asset, AssetStatus } from '../../domain/assets/Asset.js';
 import type { AssetRepository } from '../../domain/assets/AssetRepository.js';
+import { getRequestContext } from '../context/RequestContext.js';
 
 export class PrismaAssetRepository implements AssetRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -13,7 +14,7 @@ export class PrismaAssetRepository implements AssetRepository {
 
   public async save(asset: Asset): Promise<void> {
     const props = asset.toPrimitives();
-    const systemIp = '127.0.0.1'; // TODO: inject request context later
+    const systemIp = getRequestContext().ipOrigin || '0.0.0.0';
     const integrityHash = this.generateIntegrityHash(props.id, props.description, props.updatedAt);
 
     await this.prisma.jaxonUser.findUnique({ where: { id: props.createdBy } }); // Sanity check if needed
@@ -101,5 +102,13 @@ export class PrismaAssetRepository implements AssetRepository {
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     }));
+  }
+
+  public async findIntegrityHash(id: string): Promise<string | null> {
+    const row = await this.prisma.jaxonAsset.findUnique({
+      where: { id },
+      select: { integrity_hash: true },
+    });
+    return row?.integrity_hash ?? null;
   }
 }

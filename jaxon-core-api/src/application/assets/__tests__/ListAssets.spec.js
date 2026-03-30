@@ -11,6 +11,7 @@ describe('ListAssets Use Case', () => {
             findAll: vi.fn(),
             findByStatus: vi.fn(),
             findByAssignee: vi.fn(),
+            findIntegrityHash: vi.fn(),
         };
         listAssets = new ListAssets(assetRepository);
     });

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { UnauthorizedException } from '../../domain/core/exceptions.js';
 import { tokenService } from '../../infrastructure/di/container.js';
+import { setRequestActorId } from '../../infrastructure/context/RequestContext.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -25,6 +26,7 @@ export async function authMiddleware(
   try {
     const payload = await tokenService.verifyToken(token);
     req.user = { id: payload.userId, role: payload.role as string };
+    setRequestActorId(payload.userId);
     next();
   } catch (error) {
     next(new UnauthorizedException('Invalid or expired token'));

@@ -1,0 +1,97 @@
+name: J-axon V2 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  backend-validation:
+    name: Backend Analysis & Testing
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jaxon-core-api
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: jaxon_test
+          POSTGRES_PASSWORD: dev_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Code Quality (Lint)
+        run: pnpm run lint
+
+      - name: Static Analysis (Type Check)
+        run: pnpm exec tsc --noEmit
+
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate
+
+      - name: Unit Tests & Coverage Gate (85%)
+        env:
+          DATABASE_URL: postgresql://postgres:dev_password@localhost:5432/jaxon_test
+          MASTER_SALT_HASH: ${{ secrets.MASTER_SALT_HASH }}
+        run: pnpm test -- --coverage --threshold.lines 85
+
+      - name: Forensic Integrity Check
+        env:
+          DATABASE_URL: postgresql://postgres:dev_password@localhost:5432/jaxon_test
+          MASTER_SALT_HASH: ${{ secrets.MASTER_SALT_HASH }}
+        run: |
+          pnpm exec tsx src/escalationSeed.ts --run
+          pnpm exec tsx src/verify-integrity.ts
+
+  frontend-validation:
+    name: Frontend Analysis & E2E
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jaxon-client
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: E2E Tests (Human-in-the-loop validation)
+        run: pnpm exec playwright test

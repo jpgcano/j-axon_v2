@@ -1,7 +1,9 @@
 import { randomUUID } from 'crypto';
 import { AuditLog } from '../../domain/audit/AuditLog.js';
 import type { AuditLogRepository } from '../../domain/audit/AuditLogRepository.js';
+import type { AuditActionType } from '../../application/audit/AuditLogger.js';
 import { HashService } from '../security/HashService.js';
+import { setAuditLogged } from '../context/RequestContext.js';
 
 export class AuditService {
   constructor(private readonly auditRepository: AuditLogRepository) {}
@@ -9,7 +11,7 @@ export class AuditService {
   public async recordAction(params: {
     entityName: string;
     entityId: string;
-    action: string;
+    action: AuditActionType;
     payloadBefore?: any;
     payloadAfter: any;
     actorId: string;
@@ -19,8 +21,13 @@ export class AuditService {
     const lastLog = await this.auditRepository.findLastGlobal();
     const prevHash = lastLog ? lastLog.hashCurrent : '0'.repeat(64); // Genesis hash
 
-    // 2. Calculate current hash (Chaining: hash_prev + current_payload)
-    const hashCurrent = HashService.chain(prevHash, params.payloadAfter);
+    // 2. Calculate current hash (Chaining: hash_prev + action + actor + payload_after)
+    const hashCurrent = HashService.chain(
+      prevHash,
+      params.action,
+      params.actorId,
+      params.payloadAfter
+    );
 
     // 3. Create AuditLog entity
     const log = new AuditLog(
@@ -39,5 +46,6 @@ export class AuditService {
 
     // 4. Save (INSERT-ONLY enforced by repository/DB types)
     await this.auditRepository.save(log);
+    setAuditLogged(true);
   }
 }

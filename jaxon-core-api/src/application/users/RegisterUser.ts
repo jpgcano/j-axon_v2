@@ -3,6 +3,9 @@ import type { UserProps } from '../../domain/users/User.js';
 import type { UserRepository } from '../../domain/users/UserRepository.js';
 import type { PasswordHasher } from '../../domain/users/PasswordHasher.js';
 import { InvalidArgumentException } from '../../domain/core/exceptions.js';
+import type { AuditLogger } from '../audit/AuditLogger.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
 
 export interface RegisterUserRequest {
   id: string; // Passed from the outside (e.g. randomUUID())
@@ -15,7 +18,8 @@ export interface RegisterUserRequest {
 export class RegisterUser {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly passwordHasher: PasswordHasher
+    private readonly passwordHasher: PasswordHasher,
+    private readonly auditLogger: AuditLogger
   ) {}
 
   public async execute(request: RegisterUserRequest): Promise<void> {
@@ -44,5 +48,15 @@ export class RegisterUser {
     
     // Note: The actual persistence implementation (PrismaRepository) will 
     // handle the integrity_hash and audit columns during the save() operation.
+
+    await this.auditLogger.logAction({
+      entityTable: 'jaxon_users',
+      entityId: userProps.id,
+      actionType: AuditActionType.CREATE,
+      payloadBefore: null,
+      payloadAfter: user.toPrimitives(),
+      actorId: userProps.id,
+      ipOrigin: getRequestContext().ipOrigin || request.systemIp || '0.0.0.0',
+    });
   }
 }

@@ -1,0 +1,192 @@
+/**
+ * Ticket Controller Integration Tests
+ *
+ * Tests for REST endpoints with Supertest
+ * - POST /api/v1/tickets - Create ticket
+ * - GET /api/v1/tickets - List tickets
+ * - GET /api/v1/tickets/:id - Get ticket by ID
+ * - PATCH /api/v1/tickets/:id/status - Update status with RBAC
+ */
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import request from 'supertest';
+import express from 'express';
+import { ticketRouter } from '../ticketRoutes.js';
+import { TicketController } from '../TicketController.js';
+import { v4 as uuid } from 'uuid';
+import { errorHandler } from '../../middlewares/errorHandler.js';
+import { NotFoundException } from '../../../domain/core/exceptions.js';
+describe('TicketController Integration Tests', () => {
+    let app;
+    let createTicketUseCase;
+    let listTicketsUseCase;
+    let getTicketUseCase;
+    let updateTicketStatusUseCase;
+    let closeTicketUseCase;
+    let assignTicketUseCase;
+    beforeEach(() => {
+        // Setup Express app
+        app = express();
+        app.use(express.json());
+        // Mock middleware to inject user context
+        app.use((req, res, next) => {
+            req.user = {
+                id: uuid(),
+                role: process.env.TEST_USER_ROLE || 'TECH',
+            };
+            next();
+        });
+        // Create mock use cases
+        createTicketUseCase = {
+            execute: vi.fn(),
+        };
+        listTicketsUseCase = {
+            execute: vi.fn(),
+        };
+        getTicketUseCase = {
+            execute: vi.fn(),
+        };
+        updateTicketStatusUseCase = {
+            execute: vi.fn(),
+        };
+        closeTicketUseCase = {
+            execute: vi.fn(),
+        };
+        assignTicketUseCase = {
+            execute: vi.fn(),
+        };
+        // Create controller and router
+        const ticketController = new TicketController(createTicketUseCase, listTicketsUseCase, getTicketUseCase, updateTicketStatusUseCase, closeTicketUseCase, assignTicketUseCase);
+        app.post('/api/v1/tickets', (req, res, next) => ticketController.create(req, res, next));
+        app.get('/api/v1/tickets', (req, res, next) => ticketController.list(req, res, next));
+        app.get('/api/v1/tickets/:id', (req, res, next) => ticketController.getById(req, res, next));
+        app.patch('/api/v1/tickets/:id/status', (req, res, next) => ticketController.updateStatus(req, res, next));
+        // Error handler (same as app)
+        app.use(errorHandler);
+    });
+    describe('POST /tickets - Create', () => {
+        it('should create LOW risk ticket and return 201', async () => {
+            const ticketResponse = {
+                toPrimitives: () => ({
+                    id: uuid(),
+                    riskLevel: 'LOW',
+                    status: 'APPROVED',
+                    requiresApproval: false,
+                    message: 'Ticket created with LOW risk. Automatically approved.',
+                }),
+            };
+            vi.mocked(createTicketUseCase.execute).mockResolvedValueOnce(ticketResponse);
+            const response = await request(app)
+                .post('/api/v1/tickets')
+                .send({
+                assetId: uuid(),
+                issueDescription: 'Minor maintenance',
+                probability: 1,
+                consequence: 1,
+            });
+            expect(response.status).toBe(201);
+            expect(response.body.riskLevel).toBe('LOW');
+            expect(response.body.requiresApproval).toBe(false);
+        });
+        it('should create HIGH risk ticket requiring approval and return 201', async () => {
+            const ticketResponse = {
+                toPrimitives: () => ({
+                    id: uuid(),
+                    riskLevel: 'HIGH',
+                    status: 'PENDING_APPROVAL',
+                    requiresApproval: true,
+                    message: 'Ticket created with HIGH risk. Requires manager approval.',
+                }),
+            };
+            vi.mocked(createTicketUseCase.execute).mockResolvedValueOnce(ticketResponse);
+            const response = await request(app)
+                .post('/api/v1/tickets')
+                .send({
+                assetId: uuid(),
+                issueDescription: 'Critical system failure',
+                probability: 4,
+                consequence: 5,
+            });
+            expect(response.status).toBe(201);
+            expect(response.body.riskLevel).toBe('HIGH');
+            expect(response.body.requiresApproval).toBe(true);
+        });
+        it('should return 400 if required fields missing', async () => {
+            const response = await request(app)
+                .post('/api/v1/tickets')
+                .send({
+                assetId: uuid(),
+                // missing issueDescription
+                probability: 1,
+                consequence: 1,
+            });
+            expect(response.status).toBe(400);
+        });
+    });
+    describe('GET /tickets - List', () => {
+        it('should list all tickets and return 200', async () => {
+            const mockTickets = [
+                { toPrimitives: () => ({ id: uuid(), riskLevel: 'LOW' }) },
+                { toPrimitives: () => ({ id: uuid(), riskLevel: 'HIGH' }) },
+            ];
+            vi.mocked(listTicketsUseCase.execute).mockResolvedValueOnce(mockTickets);
+            const response = await request(app).get('/api/v1/tickets');
+            expect(response.status).toBe(200);
+            expect(Array.isArray(response.body)).toBe(true);
+            expect(response.body.length).toBe(2);
+        });
+        it('should return empty list if no tickets', async () => {
+            vi.mocked(listTicketsUseCase.execute).mockResolvedValueOnce([]);
+            const response = await request(app).get('/api/v1/tickets');
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual([]);
+        });
+    });
+    describe('GET /tickets/:id - Get by ID', () => {
+        it('should return ticket by ID and return 200', async () => {
+            const ticketId = uuid();
+            const mockTicket = {
+                toPrimitives: () => ({
+                    id: ticketId,
+                    riskLevel: 'MEDIUM',
+                    status: 'APPROVED',
+                }),
+            };
+            vi.mocked(getTicketUseCase.execute).mockResolvedValueOnce(mockTicket);
+            const response = await request(app).get(`/api/v1/tickets/${ticketId}`);
+            expect(response.status).toBe(200);
+            expect(response.body.id).toBe(ticketId);
+            expect(response.body.riskLevel).toBe('MEDIUM');
+        });
+        it('should return 404 if ticket not found', async () => {
+            vi.mocked(getTicketUseCase.execute).mockRejectedValueOnce(new NotFoundException('Ticket', uuid()));
+            const response = await request(app).get(`/api/v1/tickets/${uuid()}`);
+            expect(response.status).toBe(404);
+        });
+    });
+    describe('PATCH /tickets/:id/status - Update Status', () => {
+        it('should update ticket status and return 200', async () => {
+            const ticketId = uuid();
+            const mockTicket = {
+                toPrimitives: () => ({
+                    id: ticketId,
+                    status: 'IN_PROGRESS',
+                    riskLevel: 'MEDIUM',
+                }),
+            };
+            vi.mocked(updateTicketStatusUseCase.execute).mockResolvedValueOnce(mockTicket);
+            const response = await request(app)
+                .patch(`/api/v1/tickets/${ticketId}/status`)
+                .send({ status: 'IN_PROGRESS' });
+            expect(response.status).toBe(200);
+            expect(response.body.status).toBe('IN_PROGRESS');
+        });
+        it('should reject invalid status enum', async () => {
+            const ticketId = uuid();
+            const response = await request(app)
+                .patch(`/api/v1/tickets/${ticketId}/status`)
+                .send({ status: 'INVALID_STATUS' });
+            expect(response.status).toBe(400);
+        });
+    });
+});
+//# sourceMappingURL=TicketController.integration.spec.js.map

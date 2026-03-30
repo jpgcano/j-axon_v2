@@ -9,12 +9,12 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   role: z.nativeEnum(UserRole).default(UserRole.TECH),
-});
+}).strict();
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
-});
+}).strict();
 
 export class AuthController {
   constructor(

@@ -1,11 +1,15 @@
 import { User, UserRole } from '../../domain/users/User.js';
 import { InvalidArgumentException } from '../../domain/core/exceptions.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
 export class RegisterUser {
     userRepository;
     passwordHasher;
-    constructor(userRepository, passwordHasher) {
+    auditLogger;
+    constructor(userRepository, passwordHasher, auditLogger) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
+        this.auditLogger = auditLogger;
     }
     async execute(request) {
         const existingUser = await this.userRepository.findByEmail(request.email);
@@ -29,6 +33,15 @@ export class RegisterUser {
         await this.userRepository.save(user);
         // Note: The actual persistence implementation (PrismaRepository) will 
         // handle the integrity_hash and audit columns during the save() operation.
+        await this.auditLogger.logAction({
+            entityTable: 'jaxon_users',
+            entityId: userProps.id,
+            actionType: AuditActionType.CREATE,
+            payloadBefore: null,
+            payloadAfter: user.toPrimitives(),
+            actorId: userProps.id,
+            ipOrigin: getRequestContext().ipOrigin || request.systemIp || '0.0.0.0',
+        });
     }
 }
 //# sourceMappingURL=RegisterUser.js.map

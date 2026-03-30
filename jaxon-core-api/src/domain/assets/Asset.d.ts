@@ -15,16 +15,17 @@ export interface AssetProps {
     updatedAt: Date;
 }
 export declare class Asset {
-    private props;
+    private _props;
     constructor(props: AssetProps);
     get id(): string;
     get description(): string;
     get category(): string;
     get status(): AssetStatus;
     get assignedTo(): string | null;
-    changeStatus(newStatus: AssetStatus, updatedBy: string): void;
-    assignTo(userId: string, updatedBy: string): void;
-    unassign(updatedBy: string): void;
+    get props(): AssetProps;
+    changeStatus(newStatus: AssetStatus, updatedBy?: string): void;
+    assignTo(userId: string, updatedBy?: string): void;
+    unassign(updatedBy?: string): void;
     toPrimitives(): AssetProps;
 }
 //# sourceMappingURL=Asset.d.ts.map

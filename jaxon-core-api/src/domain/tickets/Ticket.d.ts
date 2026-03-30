@@ -15,8 +15,8 @@
  * - Risk = P × C → [1,25]
  * - Result: LOW (1-5), MEDIUM (6-12), HIGH (13-20), EXTREME (21-25)
  */
-import { RiskLevel } from './value-objects/RiskLevel';
-import { TicketStatus } from './value-objects/TicketStatus';
+import { RiskLevel } from './value-objects/RiskLevel.js';
+import { TicketStatus } from './value-objects/TicketStatus.js';
 export interface TicketPrimitives {
     id: string;
     assetId: string;
@@ -84,6 +84,10 @@ export declare class Ticket {
     getStatus(): TicketStatus;
     getAssignedTechId(): string | null;
     getApprovedById(): string | null;
+    getCreatedBy(): string;
+    getUpdatedBy(): string;
+    getCreatedAt(): Date;
+    getUpdatedAt(): Date;
     /**
      * Convert to primitive values
      */

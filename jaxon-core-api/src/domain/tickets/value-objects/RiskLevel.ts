@@ -30,11 +30,8 @@ export class RiskLevel {
    * @throws Error if inputs are outside valid range
    */
   static calculateFromMatrix(probability: number, consequence: number): RiskLevel {
-    if (probability < 1 || probability > 5 || consequence < 1 || consequence > 5) {
-      throw new Error(
-        `Invalid probability (${probability}) or consequence (${consequence}). Must be between 1-5.`
-      );
-    }
+    if (probability < 1 || probability > 5) throw new Error('Probability must be between 1-5');
+    if (consequence < 1 || consequence > 5) throw new Error('Consequence must be between 1-5');
 
     const riskValue = probability * consequence;
 
