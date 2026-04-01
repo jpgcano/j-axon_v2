@@ -1,7 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// J-axon v2.0.0 - Physical Data Model (MER)
+// Based on: DOCUMENTO DE DICCIONARIO DE DATOS Y MODELO ENTIDAD-RELACIÓN
+// Standards: PostgreSQL 15+, snake_case, UUID v4 PKs, 3NF, Soft Delete
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +9,232 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  TECH
+  AUDITOR
+
+  @@map("user_role")
+}
+
+enum AssetStatus {
+  ACTIVE
+  MAINTENANCE
+  RETIRED
+
+  @@map("asset_status")
+}
+
+enum RiskLevel {
+  LOW
+  MODERATE
+  HIGH
+  EXTREME
+
+  @@map("risk_level")
+}
+
+enum TicketStatus {
+  PENDING_APPROVAL
+  APPROVED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+
+  @@map("ticket_status")
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+
+  @@map("maintenance_type")
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+
+  @@map("maintenance_status")
+}
+
+// ─────────────────────────────────────────────
+// CORE MODELS
+// ─────────────────────────────────────────────
+
+/// Users table - RBAC identities (Section 4.1 MER)
+model JaxonUser {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String   @unique @db.VarChar(255)
+  password_hash String   @db.VarChar(255)
+  role_name     UserRole
+  is_active     Boolean  @default(true)
+
+  // Audit columns (Section 3 MER - ISO 9001)
+  created_by     String   @db.Uuid
+  updated_by     String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+  ip_origin      String   @db.Inet
+  integrity_hash String   @db.Char(64)
+
+  // Self-referencing audit FKs
+  creator JaxonUser  @relation("UserCreatedBy", fields: [created_by], references: [id], onDelete: NoAction)
+  updater JaxonUser  @relation("UserUpdatedBy", fields: [updated_by], references: [id], onDelete: NoAction)
+  created_users  JaxonUser[] @relation("UserCreatedBy")
+  updated_users  JaxonUser[] @relation("UserUpdatedBy")
+
+  // Reverse relations
+  assigned_assets       JaxonAsset[]       @relation("AssetAssignedTo")
+  created_assets        JaxonAsset[]       @relation("AssetCreatedBy")
+  updated_assets        JaxonAsset[]       @relation("AssetUpdatedBy")
+  created_tickets       JaxonTicket[]      @relation("TicketCreatedBy")
+  updated_tickets       JaxonTicket[]      @relation("TicketUpdatedBy")
+  assigned_tickets      JaxonTicket[]      @relation("TicketAssignedTech")
+  approved_tickets      JaxonTicket[]      @relation("TicketApprovedBy")
+  created_maintenance   JaxonMaintenance[] @relation("MaintenanceCreatedBy")
+  updated_maintenance   JaxonMaintenance[] @relation("MaintenanceUpdatedBy")
+  assigned_maintenance  JaxonMaintenance[] @relation("MaintenanceAssignedTech")
+  audit_logs            JaxonAuditLog[]    @relation("AuditLogActor")
+
+  @@map("jaxon_users")
+}
+
+/// Assets table - Physical/logical asset inventory (Section 4.2 MER)
+model JaxonAsset {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description String      @db.VarChar(255)
+  category    String      @db.VarChar(100)
+  status      AssetStatus
+  assigned_to String?     @db.Uuid
+
+  // Audit columns (Section 3 MER - ISO 9001)
+  created_by     String   @db.Uuid
+  updated_by     String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+  ip_origin      String   @db.Inet
+  integrity_hash String   @db.Char(64)
+
+  // Relations
+  assignee JaxonUser? @relation("AssetAssignedTo", fields: [assigned_to], references: [id], onDelete: NoAction)
+  creator  JaxonUser  @relation("AssetCreatedBy", fields: [created_by], references: [id], onDelete: NoAction)
+  updater  JaxonUser  @relation("AssetUpdatedBy", fields: [updated_by], references: [id], onDelete: NoAction)
+
+  // Reverse relations
+  tickets      JaxonTicket[]
+  maintenance  JaxonMaintenance[]
+
+  // Indexes (Section 5.1 MER)
+  @@index([assigned_to], name: "idx_assets_assigned_to")
+  @@index([status], name: "idx_assets_status")
+  @@map("jaxon_assets")
+}
+
+/// Tickets table - Incident registry with risk triage (Section 4.3 MER)
+model JaxonTicket {
+  id                  String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  asset_id            String      @db.Uuid
+  issue_description   String      @db.Text
+  probability         Int         @db.SmallInt // 1-5: likelihood scale
+  consequence         Int         @db.SmallInt // 1-5: impact scale
+  inherent_risk_level RiskLevel   // Calculated: probability * consequence -> RiskLevel
+  status              TicketStatus
+  assigned_tech_id    String?     @db.Uuid
+  approved_by_id      String?     @db.Uuid
+
+  // Audit columns (Section 3 MER - ISO 9001)
+  created_by     String   @db.Uuid
+  updated_by     String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+  ip_origin      String   @db.Inet
+  integrity_hash String   @db.Char(64)
+
+  // Relations
+  asset         JaxonAsset @relation(fields: [asset_id], references: [id], onDelete: NoAction)
+  assigned_tech JaxonUser? @relation("TicketAssignedTech", fields: [assigned_tech_id], references: [id], onDelete: NoAction)
+  approved_by   JaxonUser? @relation("TicketApprovedBy", fields: [approved_by_id], references: [id], onDelete: NoAction)
+  creator       JaxonUser  @relation("TicketCreatedBy", fields: [created_by], references: [id], onDelete: NoAction)
+  updater       JaxonUser  @relation("TicketUpdatedBy", fields: [updated_by], references: [id], onDelete: NoAction)
+
+  // Reverse relations
+  maintenance JaxonMaintenance[]
+
+  // Indexes (Section 5.1 MER)
+  @@index([asset_id], name: "idx_tickets_asset_id")
+  @@index([status], name: "idx_tickets_status")
+  @@index([assigned_tech_id], name: "idx_tickets_assigned_tech")
+  @@index([inherent_risk_level], name: "idx_tickets_risk_level")
+  @@map("jaxon_tickets")
+}
+
+/// Maintenance table - Preventive/corrective maintenance records (SAD reference)
+model JaxonMaintenance {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  asset_id         String            @db.Uuid
+  ticket_id        String?           @db.Uuid
+  type             MaintenanceType
+  description      String            @db.Text
+  scheduled_date   DateTime          @db.Timestamptz
+  completed_date   DateTime?         @db.Timestamptz
+  status           MaintenanceStatus
+  assigned_tech_id String?           @db.Uuid
+
+  // Audit columns (Section 3 MER - ISO 9001)
+  created_by     String   @db.Uuid
+  updated_by     String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+  ip_origin      String   @db.Inet
+  integrity_hash String   @db.Char(64)
+
+  // Relations
+  asset         JaxonAsset  @relation(fields: [asset_id], references: [id], onDelete: NoAction)
+  ticket        JaxonTicket? @relation(fields: [ticket_id], references: [id], onDelete: NoAction)
+  assigned_tech JaxonUser?  @relation("MaintenanceAssignedTech", fields: [assigned_tech_id], references: [id], onDelete: NoAction)
+  creator       JaxonUser   @relation("MaintenanceCreatedBy", fields: [created_by], references: [id], onDelete: NoAction)
+  updater       JaxonUser   @relation("MaintenanceUpdatedBy", fields: [updated_by], references: [id], onDelete: NoAction)
+
+  // Indexes
+  @@index([asset_id], name: "idx_maintenance_asset_id")
+  @@index([ticket_id], name: "idx_maintenance_ticket_id")
+  @@index([status], name: "idx_maintenance_status")
+  @@index([assigned_tech_id], name: "idx_maintenance_assigned_tech")
+  @@map("jaxon_maintenance")
+}
+
+/// Audit Logs - Immutable cryptographic ledger (Section 4.4 MER)
+/// INSERT-ONLY: No UPDATE or DELETE allowed (enforced at application level)
+model JaxonAuditLog {
+  id_log        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entity_table  String   @db.VarChar(100)
+  entity_id     String   @db.Uuid
+  action_type   String   @db.VarChar(50)
+  payload_before Json?   @db.JsonB
+  payload_after  Json    @db.JsonB
+  actor_id      String   @db.Uuid
+  ip_origin     String   @db.Inet
+  hash_prev     String   @db.Char(64)
+  hash_current  String   @db.Char(64)
+  created_at    DateTime @default(now()) @db.Timestamptz
+
+  // Relations
+  actor JaxonUser @relation("AuditLogActor", fields: [actor_id], references: [id], onDelete: NoAction)
+
+  // Indexes (Section 5.1 & 5.2 MER)
+  @@index([entity_table, entity_id], name: "idx_audit_entity")
+  @@index([actor_id], name: "idx_audit_actor")
+  @@index([hash_current], name: "idx_audit_hash_current")
+  @@index([created_at], name: "idx_audit_created_at")
+  @@map("jaxon_audit_logs")
 }

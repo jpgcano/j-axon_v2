@@ -1,0 +1,59 @@
+import { Maintenance, MaintenanceStatus } from '../../domain/maintenance/Maintenance.js';
+import { NotFoundException } from '../../domain/core/exceptions.js';
+import { WebSocketService } from '../../infrastructure/sockets/WebSocketService.js';
+import { AuditService } from '../../infrastructure/services/AuditService.js';
+import { Result } from 'better-result';
+import { NotFoundError, InternalError } from '../../domain/core/errors.js';
+import { getRequestContext } from '../../infrastructure/context/RequestContext.js';
+import { AuditActionType } from '../audit/AuditLogger.js';
+export class UpdateMaintenanceStatus {
+    maintenanceRepository;
+    wsService;
+    auditService;
+    constructor(maintenanceRepository, wsService, auditService) {
+        this.maintenanceRepository = maintenanceRepository;
+        this.wsService = wsService;
+        this.auditService = auditService;
+    }
+    async execute(request) {
+        return Result.tryPromise({
+            try: async () => {
+                const maintenance = await this.maintenanceRepository.findById(request.id);
+                if (!maintenance) {
+                    throw new NotFoundError({ entity: 'Maintenance', id: request.id });
+                }
+                const payloadBefore = maintenance.toPrimitives();
+                if (request.status === MaintenanceStatus.IN_PROGRESS) {
+                    maintenance.start(request.actorId);
+                }
+                else if (request.status === MaintenanceStatus.COMPLETED) {
+                    maintenance.complete(request.actorId);
+                }
+                else if (request.status === MaintenanceStatus.CANCELLED) {
+                    maintenance.cancel(request.actorId);
+                }
+                await this.maintenanceRepository.save(maintenance);
+                const payloadAfter = maintenance.toPrimitives();
+                // Forensic Audit Log
+                await this.auditService.recordAction({
+                    entityName: 'jaxon_maintenance',
+                    entityId: request.id,
+                    action: AuditActionType.UPDATE_STATUS,
+                    payloadBefore,
+                    payloadAfter,
+                    actorId: request.actorId,
+                    ipOrigin: getRequestContext().ipOrigin || '0.0.0.0',
+                });
+                // Emit Real-Time Event
+                this.wsService.emitEvent('maintenance:updated', payloadAfter);
+                return maintenance;
+            },
+            catch: (error) => {
+                if (error instanceof NotFoundError)
+                    return error;
+                return new InternalError({ message: 'Error updating maintenance status', cause: error });
+            },
+        });
+    }
+}
+//# sourceMappingURL=UpdateMaintenanceStatus.js.map

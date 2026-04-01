@@ -62,7 +62,7 @@ Extraídos directamente de la Matriz de Trazabilidad de Requerimientos (RTM) par
 - Precondición: Existe un ticket abierto con Nivel de Riesgo "EXTREMO".
 - Pasos de Ejecución:
   1. Autenticarse como usuario con rol TECH.
-  2. Intentar ejecutar el endpoint de cierre de ticket `PATCH /api/v1/tickets/{id}/close`.
+  2. Intentar ejecutar el endpoint de cierre de ticket `DELETE /api/v1/tickets/{id}`.
 - Resultado Esperado: El sistema debe retornar HTTP 403 Forbidden. El ticket debe permanecer abierto y el intento de cierre no autorizado debe registrarse en los logs de seguridad como `RBAC_DENIED`.
 
 4.4. QA-TC-006: Aislamiento del Motor MCP (Seguridad IA)

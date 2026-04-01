@@ -119,9 +119,69 @@ El Backend tiene estrictamente prohibido utilizar códigos genéricos si existe 
   1. El backend verifica que el `currentIntegrityHash` enviado sea exactamente igual al almacenado en la base de datos. Si no lo es, aborta con 409 Conflict.
   2. Actualiza el estado, calcula el nuevo hash y registra el evento `STATUS_CHANGED` en el log inmutable.
 
-6. ESPECIFICACIÓN DE ENDPOINTS: MOTOR DE IA (MCP)
+5.4. Asignar Activo a Usuario
+- Endpoint: `PATCH /api/v1/assets/{assetId}/assign`
+- Permiso Requerido (RBAC): `asset:update`
+- Payload de Entrada (Request Body):
+```json
+{
+  "assigneeId": "123e4567-e89b-12d3-a456-426614174000"
+}
+```
+- Comportamiento de Negocio: Asigna el activo al usuario indicado y registra el evento `UPDATE` en el log inmutable con `payload_before` y `payload_after`.
+- Respuesta Exitosa Esperada: 200 OK. Retorna el activo actualizado.
 
-6.1. Solicitar Análisis Predictivo de Mantenimiento
+5.5. Desasignar Activo
+- Endpoint: `PATCH /api/v1/assets/{assetId}/unassign`
+- Permiso Requerido (RBAC): `asset:update`
+- Payload de Entrada (Request Body): `{ }`
+- Comportamiento de Negocio: Elimina la asignación del activo y registra el evento `UPDATE` en el log inmutable.
+- Respuesta Exitosa Esperada: 200 OK. Retorna el activo actualizado.
+
+6. ESPECIFICACIÓN DE ENDPOINTS: MÓDULO TICKETS
+
+6.1. Asignar Ticket a Técnico
+- Endpoint: `PATCH /api/v1/tickets/{ticketId}/assign`
+- Permiso Requerido (RBAC): `ticket:update`
+- Payload de Entrada (Request Body):
+```json
+{
+  "techId": "123e4567-e89b-12d3-a456-426614174000"
+}
+```
+- Comportamiento de Negocio: Asigna el ticket a un técnico, mueve el estado a `IN_PROGRESS` y registra el evento `UPDATE_STATUS` en el log inmutable.
+- Respuesta Exitosa Esperada: 200 OK. Retorna el ticket actualizado.
+
+6.2. Cerrar Ticket (Soft Delete)
+- Endpoint: `DELETE /api/v1/tickets/{ticketId}`
+- Permiso Requerido (RBAC): `ticket:update`
+- Comportamiento de Negocio: Cambia el estado a `CLOSED` y registra el evento `UPDATE_STATUS` en el log inmutable.
+- Respuesta Exitosa Esperada: 200 OK. Retorna el ticket actualizado.
+
+7. ESPECIFICACIÓN DE ENDPOINTS: MÓDULO USUARIOS
+
+7.1. Desactivar Usuario
+- Endpoint: `PATCH /api/v1/users/{userId}/deactivate`
+- Permiso Requerido (RBAC): `user:deactivate` (ADMIN o MANAGER).
+- Payload de Entrada (Request Body):
+```json
+{
+  "reason": "Salida de la organización"
+}
+```
+- Comportamiento de Negocio: Marca el usuario como inactivo y registra el evento `UPDATE` en el log inmutable.
+- Respuesta Exitosa Esperada: 200 OK. Retorna `{ "status": "deactivated", "id": "..." }`.
+
+7.2. Activar Usuario
+- Endpoint: `PATCH /api/v1/users/{userId}/activate`
+- Permiso Requerido (RBAC): `user:deactivate` (ADMIN o MANAGER).
+- Payload de Entrada (Request Body): `{ }`
+- Comportamiento de Negocio: Marca el usuario como activo y registra el evento `UPDATE` en el log inmutable.
+- Respuesta Exitosa Esperada: 200 OK. Retorna `{ "status": "activated", "id": "..." }`.
+
+8. ESPECIFICACIÓN DE ENDPOINTS: MOTOR DE IA (MCP)
+
+8.1. Solicitar Análisis Predictivo de Mantenimiento
 - Endpoint: `POST /api/v1/ai/maintenance/predict`
 - Permiso Requerido (RBAC): `ticket:escalate` (Limitado a Segunda Línea o superior).
 - Payload de Entrada (Request Body):

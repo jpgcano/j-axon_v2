@@ -1,0 +1,21 @@
+name: Dependency Guard
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  blocked-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify blocked dependencies
+        run: |
+          rg -n -i '\baxion\b|\baxios\b' --glob '**/package.json' --glob '**/pnpm-lock.yaml' --glob '**/package-lock.json' . && {
+            echo "ERROR: Se encontraron dependencias bloqueadas (axion/axios)."
+            exit 1
+          } || {
+            echo "OK: No se encontraron axion/axios en manifests/lockfiles."
+          }

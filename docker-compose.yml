@@ -1,43 +1,40 @@
 version: '3.8'
 
 services:
-  jaxon-db:
+  postgres:
     image: postgres:15-alpine
     container_name: jaxon-db
     environment:
-      POSTGRES_USER: jaxon_user
-      POSTGRES_PASSWORD: jaxon_password
-      POSTGRES_DB: jaxon_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: jaxon_v2
     ports:
       - "5432:5432"
     volumes:
-      - jaxon-db-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
-  jaxon-core-api:
-    build:
+  mcp-mock:
+    build: 
       context: ./jaxon-core-api
-      dockerfile: Dockerfile
-    container_name: jaxon-core-api
+      dockerfile: src/diagnostics/Dockerfile.mock
+    container_name: jaxon-mcp-mock
+    ports:
+      - "9000:9000"
     environment:
-      DATABASE_URL: "postgresql://jaxon_user:jaxon_password@jaxon-db:5432/jaxon_db?schema=public"
-      JWT_SECRET: "your-secret-key-change-me"
-      PORT: 3001
+      MCP_MOCK_PORT: 9000
+
+  api:
+    build: ./jaxon-core-api
+    container_name: jaxon-api
+    depends_on:
+      - postgres
+      - mcp-mock
     ports:
       - "3001:3001"
-    depends_on:
-      - jaxon-db
-
-  jaxon-client:
-    build:
-      context: ./jaxon-client
-      dockerfile: Dockerfile
-    container_name: jaxon-client
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3001/api/v1"
-    ports:
-      - "3000:3000"
-    depends_on:
-      - jaxon-core-api
+      DATABASE_URL: postgresql://postgres:dev_password@postgres:5432/jaxon_v2?sslmode=disable
+      MCP_SIDECAR_URL: http://mcp-mock:9000
+      MASTER_SALT_HASH: "jaxon_super_secret_salt_64_chars_long_for_forensic_integrity"
 
 volumes:
-  jaxon-db-data:
+  postgres_data:
